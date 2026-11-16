@@ -31,6 +31,10 @@ http.createServer(async (req, res) => {
     }
     if (path.endsWith('/postMomentV2')) {
       if (!data.thumbnail_url) return send(400, { error: 'MISSING_THUMBNAIL' });
+      if (data.overlays?.some(overlay => overlay.data?.text === 'trigger-gateway-error')) {
+        res.writeHead(502, { 'Content-Type': 'text/html' });
+        return res.end('<html><title>502</title>Bad Gateway</html>');
+      }
       const stored = (await pm.state.get('locket.posts')) || [];
       const moment = { ...data, canonical_uid: `test-moment-${stored.length + 1}` };
       stored.push(moment);

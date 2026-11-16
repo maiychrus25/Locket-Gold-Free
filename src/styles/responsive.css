@@ -1,0 +1,510 @@
+@media (min-width: 1450px) {
+  main {
+    padding: 45px 55px;
+  }
+  .welcome-card {
+    min-height: 340px;
+  }
+  .welcome-copy {
+    padding: 35px 40px;
+  }
+  .hero-art {
+    transform: scale(1.07);
+    transform-origin: center;
+  }
+  .welcome-copy h2 {
+    font-size: 35px;
+  }
+}
+@media (max-width: 1150px) {
+  .sidebar {
+    width: 210px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .main-shell {
+    margin-left: 210px;
+  }
+  .topbar {
+    padding: 0 25px;
+  }
+  main {
+    padding: 30px 25px;
+  }
+  .home-columns {
+    grid-template-columns: minmax(0, 1fr) 250px;
+    gap: 16px;
+  }
+  .welcome-copy {
+    padding: 25px;
+  }
+  .welcome-copy h2 {
+    font-size: 27px;
+  }
+  .photo-card {
+    width: 145px;
+  }
+  .photo-sky,
+  .flower-scene {
+    height: 140px;
+  }
+  .photo-card.front {
+    left: 34%;
+    top: 100px;
+  }
+  .stat-card {
+    padding: 17px 12px;
+    gap: 9px;
+  }
+  .stat-card small {
+    font-size: 9px;
+  }
+  .stat-icon {
+    width: 35px;
+    height: 38px;
+  }
+  .stat-card > svg {
+    display: none;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .editor-grid {
+    grid-template-columns: minmax(0, 1fr) 230px;
+  }
+}
+@media (max-width: 1000px) {
+  .home-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-art {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+  .heading-row > .button {
+    display: none;
+  }
+  .editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tips {
+    display: none;
+  }
+  .topbar-actions {
+    gap: 12px;
+  }
+  .breadcrumb {
+    font-size: 10px;
+  }
+  .connection {
+    display: none;
+  }
+  .stats-row {
+    gap: 10px;
+  }
+  .stat-card {
+    align-items: flex-start;
+  }
+  .stat-card strong {
+    font-size: 11px;
+  }
+  .stat-card small {
+    line-height: 1.5;
+  }
+  .hero-art .photo-card.front {
+    left: 25%;
+  }
+  .welcome-copy h2 {
+    font-size: 25px;
+  }
+  .welcome-card {
+    grid-template-columns: 1.3fr 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .sidebar {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    height: 73px;
+    padding: 6px 6px max(6px, env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar .brand,
+  .sidebar-label,
+  .sidebar-bottom {
+    display: none;
+  }
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .nav-item {
+    padding: 7px 2px;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 52px;
+    margin: 0;
+    border-radius: 8px;
+    font-size: 8px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .nav-item svg {
+    width: 18px;
+    height: 18px;
+  }
+  .nav-item .nav-plus {
+    display: none;
+  }
+  .main-shell {
+    margin-left: 0;
+  }
+  .topbar {
+    height: 65px;
+    padding: 0 20px;
+  }
+  .breadcrumb {
+    font-size: 11px;
+  }
+  .breadcrumb > strong,
+  .breadcrumb > svg {
+    display: none;
+  }
+  .breadcrumb:before {
+    content: "♥";
+    background: var(--yellow);
+    font-size: 19px;
+    color: #42412a;
+    padding: 5px 8px;
+    border-radius: 9px;
+  }
+  .mobile-theme {
+    display: grid;
+  }
+  .topbar-actions {
+    gap: 6px;
+  }
+  .button.compact {
+    font-size: 10px;
+  }
+  .topbar .button.compact svg {
+    display: none;
+  }
+  main {
+    padding: 27px 20px 95px;
+  }
+  .eyebrow {
+    font-size: 8px;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 27px;
+  }
+  .heading-row p {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .page-heading {
+    margin-bottom: 23px;
+  }
+  .welcome-card {
+    min-height: 280px;
+    grid-template-columns: 1.25fr 1fr;
+  }
+  .welcome-copy {
+    padding: 25px;
+  }
+  .welcome-copy h2 {
+    font-size: 25px;
+  }
+  .hero-art {
+    transform: none;
+  }
+  .photo-card {
+    width: 140px;
+  }
+  .photo-card.back {
+    left: -3%;
+    top: 35px;
+  }
+  .hero-art .photo-card.front {
+    left: 26%;
+    top: 106px;
+  }
+  .floating-heart {
+    top: 230px;
+    left: 8%;
+  }
+  .welcome-foot {
+    font-size: 8px;
+  }
+  .welcome-copy p {
+    font-size: 10px;
+  }
+  .pill {
+    font-size: 7px;
+  }
+  .stat-card {
+    padding: 15px 12px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .stat-card strong {
+    font-size: 11px;
+  }
+  .stat-card small {
+    font-size: 9px;
+    margin-top: 5px;
+  }
+  .stats-row {
+    margin: 17px 0 23px;
+  }
+  .stat-icon {
+    height: 35px;
+    width: 35px;
+  }
+  .home-aside {
+    gap: 16px;
+  }
+  .main-footer {
+    flex-direction: column;
+    gap: 7px;
+    padding-top: 24px;
+  }
+  .chat-layout {
+    grid-template-columns: 1fr;
+  }
+  .conversation-list {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 0 15px;
+    display: flex;
+    gap: 8px;
+    overflow: auto;
+  }
+  .conversation {
+    min-width: 140px;
+    max-width: 200px;
+  }
+  .people-list {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  main {
+    padding: 23px 16px 95px;
+  }
+  .topbar {
+    padding: 0 14px;
+  }
+  .breadcrumb {
+    font-size: 10px;
+  }
+  .topbar .button.compact {
+    padding: 9px 10px;
+  }
+  .topbar-actions {
+    gap: 1px;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  .welcome-card {
+    display: block;
+    min-height: 400px;
+  }
+  .welcome-copy {
+    padding: 24px 24px 210px;
+  }
+  .welcome-copy h2 {
+    font-size: 29px;
+    max-width: 280px;
+  }
+  .welcome-copy p {
+    max-width: 230px;
+  }
+  .welcome-foot {
+    max-width: 155px;
+    line-height: 1.8;
+    margin-top: 12px;
+  }
+  .hero-art {
+    position: absolute;
+    bottom: -32px;
+    right: 0;
+    width: 210px;
+    height: 230px;
+    min-height: 0;
+    pointer-events: none;
+  }
+  .photo-card {
+    width: 113px;
+    padding: 6px 6px 10px;
+  }
+  .photo-sky,
+  .flower-scene {
+    height: 102px;
+  }
+  .photo-card > span {
+    font-size: 7px;
+    margin-top: 7px;
+  }
+  .photo-card.back {
+    top: 33px;
+    left: 3%;
+  }
+  .hero-art .photo-card.front {
+    top: 72px;
+    left: 43%;
+  }
+  .flower {
+    font-size: 90px;
+    left: 12px;
+    top: -20px;
+  }
+  .small-flower {
+    font-size: 50px;
+    top: 45px;
+    left: 0;
+  }
+  .flower-stem {
+    left: 54px;
+    top: 50px;
+  }
+  .flower-label {
+    font-size: 10px;
+  }
+  .floating-heart {
+    height: 33px;
+    width: 33px;
+    top: 170px;
+    left: 20%;
+  }
+  .floating-heart svg {
+    width: 18px;
+  }
+  .art-spark.one {
+    font-size: 26px;
+    right: 11%;
+    top: 6px;
+  }
+  .art-spark.two {
+    font-size: 26px;
+    top: 95px;
+    left: -8%;
+  }
+  .stats-row {
+    gap: 8px;
+  }
+  .stat-card {
+    padding: 13px 10px;
+    border-radius: 12px;
+  }
+  .stat-card strong {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .stat-card small {
+    font-size: 8px;
+  }
+  .home-aside {
+    grid-template-columns: 1fr;
+  }
+  .privacy-card {
+    padding: 21px;
+  }
+  .privacy-card h3 {
+    max-width: none;
+  }
+  .getting-started h3 {
+    font-size: 14px;
+  }
+  .step strong {
+    font-size: 12px;
+  }
+  .step small {
+    font-size: 10px;
+  }
+  .getting-started > p {
+    font-size: 11px;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .inline-form {
+    flex-wrap: wrap;
+  }
+  .inline-form input {
+    flex-basis: 100%;
+  }
+  .connect-strip {
+    flex-wrap: wrap;
+    padding: 13px;
+  }
+  .connect-strip > svg {
+    display: none;
+  }
+  .connect-strip .button {
+    width: 100%;
+  }
+  .profile-summary {
+    gap: 12px;
+  }
+  .profile-summary > div:nth-child(2) {
+    max-width: calc(100% - 80px);
+  }
+  .section-heading h2 {
+    font-size: 15px;
+  }
+  .live-chat .section-heading {
+    flex-wrap: wrap;
+  }
+  .banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .daily-grid {
+    grid-template-columns: 1fr;
+  }
+  .nav-item {
+    font-size: 7px;
+  }
+  .nav-item span {
+    max-width: 48px;
+  }
+  .button-row {
+    flex-wrap: wrap;
+  }
+  .dialog-head h2 {
+    font-size: 17px;
+  }
+  dialog {
+    padding: 21px;
+  }
+  .empty {
+    padding: 38px 4px;
+  }
+  .operation-heading code {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -4,9 +4,9 @@ import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createSdkSession } from "../server/client.js";
-import { isolatedMedia, applyWorkerResult } from "../server/media.js";
-import { executeMedia } from "../server/media-worker.js";
+import { createSdkSession } from "../server/services/locket/client.js";
+import { isolatedMedia, applyWorkerResult } from "../server/services/locket/media.js";
+import { executeMedia } from "../server/services/locket/media-worker.js";
 
 test("isolated worker extracts and compresses real video, cleaning success and encoder failure", async (t) => {
   const directory = await mkdtemp(join(tmpdir(), "lock-gold-test-"));

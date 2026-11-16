@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { createApp } from "../server/app.js";
-import { executeMedia } from "../server/media-worker.js";
+import { executeMedia } from "../server/services/locket/media-worker.js";
 
 async function setup(t, options = {}) {
   const calls = [];
@@ -67,6 +67,7 @@ async function setup(t, options = {}) {
         },
         post: async (args) => {
           calls.push(args);
+          if (options.postError) throw options.postError;
           if (options.waitForMedia) await options.waitForMedia;
           return { canonical_uid: "posted-id", caption: args.caption };
         },
@@ -581,4 +582,41 @@ test("video normalization uses detected bytes instead of the declared MIME", asy
   });
   assert.equal(response.status, 200);
   assert.equal(detected, "video/webm");
+});
+
+test("a 502 on publishing stays unconfirmed and is never retried automatically", async (t) => {
+  const postError = Object.assign(
+    new Error("API request to postMomentV2 failed: Bad Gateway"),
+    { statusCode: 502 },
+  );
+  const { url, login, calls } = await setup(t, { postError });
+  const cookie = await login();
+  const form = new FormData();
+  form.append(
+    "image",
+    new Blob(
+      [
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
+          "base64",
+        ),
+      ],
+      { type: "image/png" },
+    ),
+    "photo.png",
+  );
+  const response = await fetch(url + "/api/media/post", {
+    method: "POST",
+    headers: { Cookie: cookie, "X-Lock-Client": "web" },
+    body: form,
+  });
+  assert.equal(response.status, 502);
+  const data = await response.json();
+  assert.equal(data.code, "UPSTREAM_UNAVAILABLE");
+  assert.equal(data.upstreamStatus, 502);
+  assert.equal(data.outcome, "unknown");
+  assert.match(data.error, /chưa xác nhận/i);
+  assert.match(data.error, /lịch sử/i);
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  assert.equal(calls.length, 1);
 });

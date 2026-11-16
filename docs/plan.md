@@ -29,3 +29,7 @@ English identifiers, Vietnamese UI. No real credentials, push, deployment or pro
 - [x] Run two browser stress rounds, each desktop/mobile/light/dark, plus concurrent API requests.
 - [x] Review actual new files/diff; address findings; run make build, make test, make lint and docs-check with evidence.
 - [x] Hand off local URL, start command and verification limits. No deploy without approval.
+
+## Later structural changes
+
+The operator authorized a structural refactor and Git push after this initial plan. See `docs/plans/project-structure.md` and `docs/architecture.md`; SDK client/media modules have moved from `server/` to `server/services/locket/`. This original plan remains historical.

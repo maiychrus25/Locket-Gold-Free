@@ -5,11 +5,12 @@ import { once } from "node:events";
 import { existsSync } from "node:fs";
 import { dirname } from "node:path";
 import { createApp } from "../server/app.js";
-import { createSdkSession } from "../server/client.js";
+import { createSdkSession } from "../server/services/locket/client.js";
 import { useLocalUpstream } from "./upstream.js";
-import { executeMedia } from "../server/media-worker.js";
+import { executeMedia } from "../server/services/locket/media-worker.js";
 
 test("real SDK authenticates, refreshes, uploads and handles failure over local HTTP", async (t) => {
+  let failPost = false;
   const upstream = createServer(async (req, res) => {
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
@@ -58,6 +59,10 @@ test("real SDK authenticates, refreshes, uploads and handles failure over local 
     }
     if (req.url === "/upload")
       return res.end(JSON.stringify({ downloadTokens: "media-download" }));
+    if (req.url.endsWith("postMomentV2") && failPost) {
+      res.writeHead(502, { "Content-Type": "text/html" });
+      return res.end("<html><title>502</title>Bad Gateway</html>");
+    }
     if (req.url.endsWith("postMomentV2"))
       return res.end(
         JSON.stringify({
@@ -154,6 +159,21 @@ test("real SDK authenticates, refreshes, uploads and handles failure over local 
   assert.equal(post.data.sent_to_self_only, true);
   assert.equal(post.data.sent_to_all, false);
   assert.ok(post.data.thumbnail_url.includes("media-download"));
+  failPost = true;
+  const gatewayFailure = await fetch(base + "/api/media/post", {
+    method: "POST",
+    headers: { Cookie: cookie, "X-Lock-Client": "web" },
+    body: form,
+  });
+  assert.equal(gatewayFailure.status, 502);
+  const gatewayError = await gatewayFailure.json();
+  assert.equal(gatewayError.code, "UPSTREAM_UNAVAILABLE");
+  assert.equal(gatewayError.upstreamStatus, 502);
+  assert.equal(gatewayError.outcome, "unknown");
+  assert.equal(
+    observed.filter((value) => value.path.endsWith("postMomentV2")).length,
+    2,
+  );
   const directory = dirname(resource.client.session.sessionPath);
   await send("/api/auth/logout", {});
   assert.equal(

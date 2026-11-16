@@ -72,14 +72,14 @@ async function noOverflow(page) {
   }));
   expect(widths.scroll).toBeLessThanOrEqual(widths.client + 1);
   const overlap = await page.evaluate(() => {
-    const footer = document.querySelector('.welcome-foot');
-    const photo = document.querySelector('.photo-card.back');
+    const footer = document.querySelector(".welcome-foot");
+    const photo = document.querySelector(".photo-card.back");
     if (innerWidth > 480 || !footer || !photo) return false;
     const text = footer.getBoundingClientRect();
     const art = photo.getBoundingClientRect();
     return text.bottom > art.top && text.right > art.left;
   });
-  expect(overlap, 'Hero artwork must not cover the privacy text').toBe(false);
+  expect(overlap, "Hero artwork must not cover the privacy text").toBe(false);
 }
 
 test("guest navigation, theme, empty states and minimum width stay usable", async ({
@@ -469,4 +469,46 @@ test("another tab replacing the account cannot submit the old media draft", asyn
   await page.reload();
   await go(page, "Tạo khoảnh khắc");
   await expect(page.getByLabel("Chú thích", { exact: true })).toBeEmpty();
+});
+
+test("an upstream publishing gateway error preserves the draft and warns about duplicate posts", async ({
+  page,
+}) => {
+  await signedIn(page);
+  await go(page, "Tạo khoảnh khắc");
+  await page
+    .locator("input[type=file]")
+    .first()
+    .setInputFiles({ name: "draft.png", mimeType: "image/png", buffer: png });
+  const caption = page.getByLabel("Chú thích", { exact: true });
+  await caption.fill("trigger-gateway-error");
+  let requests = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/api/media/post")) requests++;
+  });
+  const result = page.waitForResponse((response) =>
+    response.url().endsWith("/api/media/post"),
+  );
+  await page
+    .getByRole("button", { name: "Đăng khoảnh khắc ảnh / video", exact: true })
+    .click();
+  const response = await result;
+  expect(response.status()).toBe(502);
+  expect(await response.json()).toMatchObject({
+    code: "UPSTREAM_UNAVAILABLE",
+    upstreamStatus: 502,
+    outcome: "unknown",
+  });
+  await expect(page.getByRole("alert")).toContainText(
+    "Chưa xác nhận thao tác thành công",
+  );
+  await expect(page.getByRole("alert")).toContainText("kiểm tra lịch sử");
+  await expect(caption).toHaveValue("trigger-gateway-error");
+  await expect(page.getByAltText("Xem trước khoảnh khắc")).toBeVisible();
+  await expect(
+    page.getByText("Máy chủ đã phản hồi", { exact: false }),
+  ).toHaveCount(0);
+  await page.waitForTimeout(200);
+  expect(requests).toBe(1);
+  await noOverflow(page);
 });

@@ -78,8 +78,12 @@ export async function isolatedMedia(
       );
       worker.once("message", (result) => {
         applyWorkerResult(client, originalToken, originalRefresh, result);
-        if (result.error) reject(new Error(result.error));
-        else resolve(result.data);
+        if (result.error) {
+          const error = new Error(result.error);
+          if (Number.isInteger(result.statusCode))
+            error.statusCode = result.statusCode;
+          reject(error);
+        } else resolve(result.data);
       });
       const { uid, email, idToken, refreshToken, expiresAt } = client.session;
       worker.send(

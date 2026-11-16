@@ -2,6 +2,32 @@
 
 A Vietnamese web workspace for Locket accounts, backed by `locket.js@0.0.3`: photo/video posting, feed/history, profile, friends, chat and advanced SDK tools. The name does not mean a paid Gold subscription is unlocked.
 
+Current limitation: the development machine observed HTTP 502 from the upstream Locket API on 2026-11-16. The website reports unconfirmed operations and preserves drafts; it does not automatically retry posts. Passing local simulations does not establish live provider availability.
+
+## Project structure
+
+```text
+src/
+  app/                   app state, navigation and layout
+  components/            reusable UI primitives
+  features/              auth, feed, friends, chat, moments, tools
+  lib/                   browser requests and data helpers
+  styles/                tokens, base, layout, components, responsive rules
+  main.jsx               React entry point
+server/
+  routes/                HTTP endpoints by responsibility
+  session/               lifecycle, account context and redaction
+  middleware/            request security and error handling
+  services/locket/       SDK adapter, isolated media process and worker
+  app.js                 Express composition root
+  index.js               local server entry point
+shared/operations/       field schemas and capability descriptors
+tests/                   HTTP, SDK, media, data and browser regressions
+docs/                    architecture, API coverage, plans and evidence
+```
+
+See [architecture](docs/architecture.md) for dependency direction and module responsibilities. The public registry remains `shared/operations.js` so callers share one validated catalog.
+
 ## Development
 
 Requires Node.js 24+ and ffmpeg.

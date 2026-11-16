@@ -25,3 +25,5 @@ Native Node HTTP integration tests exercise authentication, session isolation, C
 
 ## Post-implementation notes
 Final review added session-generation binding and stale-response protection, verified-author handling around the SDK's history bug, stable recipient/lookup/filter behavior, parent-owned media history, token-merge protection, and MOV/WebM-to-MP4 conversion. These corrections preserve the requested features while preventing operations from targeting the wrong account or person. Public deployment and live-account interoperability remain outside the verified result.
+
+The operator subsequently requested project restructuring and GitHub publication. Current module paths are in `docs/architecture.md`; the original implementation body above is retained as historical design. Upstream 502/503/504 errors now retain their status across media IPC and report unavailable/unknown outcomes without automatic retries. The observed gateway failure prevents claiming live publishing success.

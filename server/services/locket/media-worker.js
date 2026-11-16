@@ -76,6 +76,9 @@ if (process.send) {
       } catch (error) {
         process.send({
           error: String(error.message).slice(0, 1000),
+          statusCode: Number.isInteger(error.statusCode)
+            ? error.statusCode
+            : undefined,
           session: {
             idToken: client.session.idToken,
             refreshToken: client.session.refreshToken,

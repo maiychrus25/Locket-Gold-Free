@@ -1,5 +1,7 @@
 # Verification record
 
+Latest: [structure refactor and gateway-error verification](verification/project-structure.md). The record below describes the initial implementation.
+
 Status: Verified in local development on 2026-11-16. No public deployment.
 
 ## Observed result

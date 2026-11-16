@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { request, getSessionGeneration } from "../src/api.js";
+import { request, getSessionGeneration } from "../src/lib/api.js";
 
 test("late 401 from an old session cannot expire the new login", async (t) => {
   const originalWindow = globalThis.window;

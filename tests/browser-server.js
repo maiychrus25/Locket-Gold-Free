@@ -1,6 +1,6 @@
 import { createServer } from "vite";
 import { createApp } from "../server/app.js";
-import { executeMedia } from "../server/media-worker.js";
+import { executeMedia } from "../server/services/locket/media-worker.js";
 import { useLocalUpstream } from "./upstream.js";
 
 // This process is exclusively a test harness; production never installs this transport.

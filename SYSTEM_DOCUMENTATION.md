@@ -22,6 +22,8 @@ React renders the website; Vite builds browser assets to `dist/`. Express serves
 
 `shared/operations.js` is the single allowlist and form metadata source. Main screens use dedicated everyday flows; advanced tools cover all other supported operations. The account-facing API inventory and exclusions are in [api-coverage.md](docs/api-coverage.md).
 
+The application layout is documented in [architecture.md](docs/architecture.md). `src/main.jsx` bootstraps `src/app/App.jsx`; feature panels, shared UI, browser helpers and styles have separate directories. `server/app.js` composes middleware, session lifecycle and five route modules. SDK integration and the isolated media worker live in `server/services/locket/`. Capability descriptors live under `shared/operations/`; the registry keeps its existing exports and ordering. The refactor adds no dependencies and preserves the HTTP/UI contracts except the documented transient-error metadata below.
+
 ## HTTP contract
 
 | Route | Purpose |
@@ -36,6 +38,8 @@ React renders the website; Vite builds browser assets to `dist/`. Express serves
 | GET /api/chat/events?otherUserId=UID | SSE `message`, `status` and `error` events from SDK WebSocket |
 
 All mutating requests require `X-Lock-Client: web` and a same-origin Origin when supplied. The web client also binds account operations and logout to the safe session `generation` using `X-Lock-Session`; SSE carries the marker in its query. A mismatched supplied marker returns 409 `SESSION_CHANGED` before running the SDK. Direct non-browser API callers may omit this UI binding. The marker is not an authentication credential. API responses are no-store. Errors return `{error}` with a non-2xx status. There is no arbitrary method/endpoint proxy, filesystem-path input, or arbitrary remote-media fetch. Upload local files; upstream media-download URLs remain in returned account data.
+
+When an SDK error carries upstream status 502, 503 or 504, HTTP remains 502 and the body additionally includes `code: "UPSTREAM_UNAVAILABLE"`, `upstreamStatus` and `outcome: "unknown"`. The redacted error message explains that completion is unconfirmed and history should be checked before retrying. No automatic write retry is added; drafts stay available. Other failures retain their existing response shape. This classification does not assert that a failed gateway response means no post was created.
 
 ## Sessions and sensitive data
 
@@ -54,6 +58,8 @@ Each input file is at most 32 MiB, with at most one image and one video per requ
 Only two media operations run globally and one per account. A browser disconnect does not release an active SDK processing slot. Each media operation runs in an isolated Node worker/process group, with its own TMPDIR and a 180-second deadline. Both ffmpeg and its Node owner are stopped before cleanup. The entire job directory is removed on success, error and timeout. A hard machine/process crash can still leave OS temporary files; graceful shutdown cleans resources. The worker sends tokens only over local IPC and never prints them. Uploading a file does not activate Locket Gold.
 
 Worker results preserve the posted-moment history in the parent session directory. A worker may update parent tokens only if they have not changed since dispatch; any worker token is retained for response redaction. MOV/WebM inputs are transcoded to an MP4 container before upload rather than labeled as MP4 without conversion.
+
+The internal worker failure IPC now carries an optional integer `statusCode` alongside its existing redacted-at-response message and refreshed session fields. The parent reconstructs the SDK error status for API classification. No raw upstream response body is forwarded as metadata. This is an internal IPC change, not a credential export.
 
 The SDK's video storage limit is 6,291,455 bytes; automatic compression targets 5,650,000 bytes by default. The website offers balanced/video/audio priorities, automatic video thumbnail or a separate image, caption presets and custom emoji/colors, private/self or selected recipients. It cannot guarantee that the live provider accepts every variant or that free accounts have a paid entitlement. Codec choice and actual quality depend on ffmpeg/SDK behavior.
 
@@ -81,3 +87,5 @@ The test-only browser harness (`tests/browser-server.js`) rewrites known depende
 - Additional reference requested by the operator: https://github.com/leanhminh2104/locketlam (MIT). The Python repository was read without installing/executing it; its examples were used to cross-check media priorities, custom thumbnail, caption styling, private recipients and chat read-receipt behavior. No Python code was copied or service added.
 - Design tokens follow the DESIGN.md text/YAML format: https://github.com/google-labs-code/design.md.
 - No release has been deployed. Live-account verification is outstanding; no universal Gold unlock or anti-detection guarantee is made.
+- On 2026-11-16 at approximately 10:00 UTC, unauthenticated GET probes to the API root, postMomentV2 and getLatestMomentV2 all returned HTTP 502 HTML with `via: 1.1 google`; an unauthenticated POST to the read-only getLatestMomentV2 endpoint returned the same result. Node and direct Python requests agreed, with no proxy environment configured. This confirms gateway failure on the observed network path; it does not establish a global outage or identify the provider's underlying cause. No real account post was replayed. Live publishing remains blocked while that gateway error persists.
+- Firebase project/key identifiers come from the third-party SDK. Ownership has not been independently verified against the official Locket application; a Google-hosted authentication endpoint alone is not proof of project ownership.
