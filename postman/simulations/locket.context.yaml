@@ -1,0 +1,23 @@
+purpose:
+  stands_in_for: Locket private API and Firebase endpoints used by locket.js 0.0.3.
+  unblocks: Local adapter and browser checks without real passwords, posts or messages.
+assumptions:
+  - id: sdk-envelope-contract
+    status: unknown
+    claim: The live provider accepts the request shapes and returns the result envelopes assumed by locket.js 0.0.3.
+    reason: Fixtures are derived from the installed SDK source. No official contract or live credentials were available. Published mock discovery was skipped because the Postman CLI is signed out.
+    verification: Local SDK HTTP integration and 112 browser checks passed against local fixtures, including controlled upstream errors. Caller behavior is verified; live interoperability remains unverified.
+    source: node_modules/locket.js/lib/client.js; postman/mocks/locket/default.cjs; tests/sdk.test.js
+    updated_at: "2026-11-16"
+  - id: free-plan-media
+    status: unknown
+    claim: A free Locket account can successfully post every media and caption variant exposed by the SDK.
+    reason: No real account has been used. The website does not claim to activate Gold subscriptions.
+    verification: Not tested against live Locket.
+    source: docs/spec.md; shared/operations.js
+    updated_at: "2026-11-16"
+fingerprints:
+  - id: initial-development
+    date: "2026-11-16"
+    commit: local-uncommitted
+    cli: Postman 1.80.0; locket.js 0.0.3

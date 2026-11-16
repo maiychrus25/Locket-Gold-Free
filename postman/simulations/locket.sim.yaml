@@ -1,0 +1,12 @@
+simulation: locket-local
+routing: path
+mocks:
+  - name: locket-sdk-contract
+    routeKey: locket
+    path: postman/mocks/locket
+    origin:
+      - api.locketcamera.com
+      - identitytoolkit.googleapis.com
+      - securetoken.googleapis.com
+      - firestore.googleapis.com
+      - firebasestorage.googleapis.com

@@ -1,0 +1,10 @@
+version: 1
+name: locket-sdk-contract
+slug: locket-sdk-contract
+protocol: http
+port: 4418
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.cjs
+    default: true
