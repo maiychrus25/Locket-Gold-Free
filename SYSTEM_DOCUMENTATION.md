@@ -14,7 +14,7 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:4317. Override the local port with `PORT`. The server binds only to loopback. To run a prebuilt local artifact, use `make build`, then `npm start`. Source editing and Vite run only in development. No hosting registration, Git push, deployment, migration, or production changes are part of this delivery.
+Open http://127.0.0.1:4317. Override the local port with `PORT`. The server binds only to loopback. To run a prebuilt local artifact, use `make build`, then `npm start`. Source editing and Vite run only in development. No hosting registration, runtime deployment, migration, or production changes were performed. The operator subsequently authorized source publication to https://github.com/maiychrus25/Locket-Gold-Free, branch main.
 
 ## Architecture and dependencies
 

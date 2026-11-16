@@ -1,6 +1,6 @@
 # Structure refactor and gateway-error verification
 
-Status: Implementation verified locally; source publication pending.
+Status: Implementation verified locally and published to GitHub main.
 
 ## Scope and result
 
@@ -290,3 +290,7 @@ Running 120 tests using 1 worker
 
   120 passed (1.4m)
 ```
+
+## Publication
+
+Reviewed implementation commit `f113384d5f7da16eb9b5abc6685e6db47e14178f` was pushed without force to [https://github.com/maiychrus25/Locket-Gold-Free](https://github.com/maiychrus25/Locket-Gold-Free), branch `main`. The remote SHA was compared with local HEAD and matched. The following documentation-only commit records this completed publication. No production hosting deployment was performed.

@@ -1,6 +1,6 @@
 # Project architecture
 
-Status: Implemented and verified in development; source publication pending.
+Status: Implemented and verified in development; source published to GitHub main.
 
 ## Scope and rollback
 
