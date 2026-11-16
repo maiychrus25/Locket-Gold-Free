@@ -29,12 +29,18 @@ test.afterEach(async ({ page }) => {
 test("pending chat history locks its recipient and conversation until completion", async ({
   page,
 }) => {
+  await page.route("**/api/operations/friends/getAllFriends", route => route.fulfill({
+    json: { data: [
+      { uid: "alice", displayName: "Alice", username: "alice" },
+      { uid: "bob", displayName: "Bob", username: "bob" },
+    ] },
+  }));
   await page.route("**/api/operations/chat/getConversations", (route) =>
     route.fulfill({
       json: {
         data: [
-          { conversation_id: "alice-conversation", peer_uid: "alice" },
-          { conversation_id: "bob-conversation", peer_uid: "bob" },
+          { conversation_id: "alice-conversation", peer_uid: "alice", other_user: { uid: "alice", first_name: "Alice" } },
+          { conversation_id: "bob-conversation", peer_uid: "bob", other_user: { uid: "bob", first_name: "Bob" } },
         ],
       },
     }),
@@ -59,18 +65,21 @@ test("pending chat history locks its recipient and conversation until completion
   });
   await signedIn(page);
   await go(page, "Tin nhắn");
-  const recipient = page.getByLabel("UID người nhận tin nhắn");
+  const recipient = page.getByLabel("Người nhận tin nhắn", { exact: true });
   try {
-    await page.locator(".conversation").filter({ hasText: "alice" }).click();
+    const history = page.waitForRequest(request => request.url().endsWith("/api/operations/chat/getMessages"));
+    await page.getByRole("button", { name: /Alice.*Mở trò chuyện/ }).click();
+    expect((await history).postDataJSON()).toEqual({ otherUserId: "alice", conversationId: "alice-conversation", fetchServer: true });
     await expect(recipient).toHaveValue("alice");
     await expect(recipient).toBeDisabled();
     await expect(
-      page.locator(".conversation").filter({ hasText: "bob" }),
+      page.getByRole("button", { name: /Bob.*Mở trò chuyện/ }),
     ).toBeDisabled();
     release();
     await expect(page.locator(".message")).toContainText("Alice history");
     await expect(recipient).toBeEnabled();
-    await recipient.fill("bob");
+    await page.locator(".chat-layout").getByRole("button", { name: "Chọn từ bạn bè", exact: true }).click();
+    await recipient.selectOption({ label: "Bob" });
     await expect(page.locator(".message")).toHaveCount(0);
   } finally {
     release();
@@ -132,6 +141,9 @@ test("history defaults to the current user and invalidates cursors on filter edi
   page,
 }) => {
   const inputs = [];
+  await page.route("**/api/operations/friends/getAllFriends", route => route.fulfill({
+    json: { data: [{ uid: "another-user", displayName: "Linh", username: "linh" }] },
+  }));
   await page.route("**/api/operations/moments/getMoments", (route) => {
     inputs.push(route.request().postDataJSON());
     return route.fulfill({
@@ -148,7 +160,8 @@ test("history defaults to the current user and invalidates cursors on filter edi
   });
   await expect(next).toBeVisible();
   expect(inputs[0]).toEqual({ limit: 20, filteredByUserId: session.user.uid });
-  await page.getByLabel("Lọc bảng tin theo UID").fill("another-user");
+  await page.locator(".feed-panel").getByRole("button", { name: "Chọn từ bạn bè", exact: true }).click();
+  await page.getByLabel("Khoảnh khắc của", { exact: true }).selectOption({ label: "Linh" });
   await expect(next).toHaveCount(0);
   const filtered = page.waitForRequest((request) =>
     request.url().endsWith("/api/operations/moments/getMoments"),

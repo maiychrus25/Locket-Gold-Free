@@ -18,7 +18,7 @@ export function Login({ close, connected }) {
         password,
       });
       if (!session.authenticated)
-        throw new Error("Máy chủ chưa xác nhận đăng nhập. Vui lòng thử lại.");
+        throw new Error("Chưa đăng nhập được. Bạn vui lòng thử lại.");
       setPassword("");
       connected(session);
     } catch (failure) {
@@ -75,8 +75,7 @@ export function Login({ close, connected }) {
       </form>
       <p className="secure-note">
         <ShieldCheck size={16} />
-        Phiên đăng nhập được bảo vệ bằng cookie HttpOnly. Token không hiển thị
-        trên trình duyệt.
+        Mật khẩu chỉ dùng để đăng nhập và không được lưu trên website.
       </p>
     </Modal>
   );

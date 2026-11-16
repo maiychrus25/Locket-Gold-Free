@@ -17,7 +17,6 @@ export const personName = (value) =>
   [value?.first_name || value?.firstName, value?.last_name || value?.lastName]
     .filter(Boolean)
     .join(" ") ||
-  identity(value) ||
   "Người dùng";
 export const imageUrl = (value) =>
   safeUrl(

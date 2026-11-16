@@ -17,7 +17,7 @@ export function Sidebar({ setPage, page, setTheme, theme }) {
           <Heart fill="currentColor" size={23} />
         </span>
         <span>
-          lock gold<span className="brand-tag">FREE</span>
+          lock gold<span className="brand-tag">FREE · YOUR LITTLE MOMENTS</span>
         </span>
       </a>
       <div className="sidebar-label">KHÔNG GIAN CỦA BẠN</div>
@@ -38,10 +38,10 @@ export function Sidebar({ setPage, page, setTheme, theme }) {
       <div className="sidebar-bottom">
         <div className="little-note">
           <Sparkles size={20} />
-          <strong>Thêm một chút gần gũi.</strong>
-          <p>Mọi khoảnh khắc đều đáng được giữ lại.</p>
-          <button onClick={() => setPage("compose")}>
-            Tạo khoảnh khắc <ArrowUpRight size={16} />
+          <strong>Nhiều hơn. Vẫn miễn phí.</strong>
+          <p>Ảnh, video, cảm xúc và những người bạn thương.</p>
+          <button onClick={() => setPage("guide")} aria-label="Khám phá tính năng miễn phí">
+            Khám phá tính năng <ArrowUpRight size={16} />
           </button>
         </div>
         <button

@@ -61,3 +61,12 @@ Upload dropzone with file preview and caption overlay. Native labeled controls, 
 
 ## Do's and Don'ts
 Use 150ms opacity/color transitions, respect reduced motion, keep touch targets at least 44px. Preserve drafts after failed requests. Contrast must remain readable in both themes. Never display session tokens or suggest guaranteed Premium access.
+
+## Free experience refresh · 2026-11-16
+Keep the warm yellow identity, with a more editorial photo-journal composition: generous readable type, square media, compact navigation, useful context panels and clear section labels. Primary creation tools use a camera/viewfinder and live caption preview; technical operation names belong in advanced tools. Account content must be real; illustrations are decorative and never presented as account memories.
+
+Use semantic tokens for all themes. Web-only camera skins use cream, rose and ocean accents without changing published image bytes. Cards use 20–28px corners, thin borders, restrained shadows and 16/24/32px spacing. Body copy is at least 14px in primary flows, secondary copy at least 12px. Desktop has a stable 232px rail and a content column capped at 1440px; tablet collapses context panels; mobile retains the six main navigation destinations and reaches the feature guide from the top bar. Keep 44px controls, visible focus, wrapping labels and no horizontal page scroll at 320px.
+
+All implemented tools are free, with no payment, subscription check, advertisement or local 20-friend gate. A capability guide distinguishes available web tools, provider-enforced limits and features absent from the SDK. Native widget/icon changes, subscription badges, streak restoration and music-provider linking must never be represented as completed web operations. Use concise contextual limits rather than repeated disclaimers in every form.
+
+Consumer presentation direction: show only the website's available free features and useful actions. Keep protocol limits, unsupported native features and source research in documentation. Never render response JSON, endpoint/method names, raw IDs or device internals. Choose friends by real names and moments by captions/previews. Use native color pickers, familiar quality choices, and human recovery messages; internal data contracts remain unchanged.

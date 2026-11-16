@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — free experience refresh
+
+- Researched official Locket/Gold features and documented implemented, provider-controlled and native-only capabilities.
+- Added a free capability guide, camera capture, visual media/caption previews and caption presets.
+- Added history date/month filters, grid/list browsing, emoji choices, viewer dialogs and weekly Rollcall reads.
+- Added a structured profile editor and persistent browser appearance preferences.
+- Refined desktop/mobile light/dark layouts while keeping all 53 SDK operations and existing session, validation, media and draft protections.
+- No dependencies, payments, paywall, advertisements or local friend-count gate added; no official Gold entitlement activation claimed.
+- Consumer UI removes JSON, protocol controls and raw identifiers; named friend/moment selectors replace manual IDs while all 53 backend operations remain available.
+- Fixed 79 preset colors incompatible with custom-color validation by preserving preset defaults; custom color input now uses a native picker.
+
 ## 0.1.0 — initial source publication
 
 - Vietnamese web workspace covering 53 account-facing SDK operations.

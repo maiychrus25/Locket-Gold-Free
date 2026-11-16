@@ -2,9 +2,9 @@ import React from "react";
 import { ImagePlus, Sparkles, Image, Heart, Users } from "lucide-react";
 import { Workspace } from "../tools/Workspace.jsx";
 
-export function ComposePage({ workspaceProps, relevant, catalog }) {
+export function ComposePage({ workspaceProps, relevant }) {
   return (
-    <div className="editor-grid">
+    <div className="editor-grid creator-page">
       <section className="panel">
         <div className="section-heading">
           <h2>
@@ -16,6 +16,7 @@ export function ComposePage({ workspaceProps, relevant, catalog }) {
         <Workspace
           {...workspaceProps}
           operations={relevant("compose")}
+          initialLabel="Ảnh hoặc video, theo cách của bạn"
         />
       </section>
       <aside className="panel tips">
@@ -38,17 +39,9 @@ export function ComposePage({ workspaceProps, relevant, catalog }) {
           <span>Chọn người nhận trước khi chia sẻ.</span>
         </div>
         <hr />
-        <h4>Kiểu chú thích có sẵn</h4>
-        <div className="preset-chips">
-          {catalog.presets.slice(0, 10).map((preset) => (
-            <span className="badge" key={preset.value}>
-              {preset.label}
-            </span>
-          ))}
-        </div>
-        <p className="small">
-          Tùy chọn thực tế được máy chủ cung cấp trong biểu mẫu.
-        </p>
+        <h4>Giữ lại điều nhỏ hôm nay</h4>
+        <p>Chọn một kiểu chú thích ngay dưới khung ảnh, rồi chỉnh màu và emoji theo ý anh.</p>
+        <p className="small">Ảnh và video tối đa 32 MB mỗi tệp. Camera chỉ mở khi anh chọn; đóng camera sẽ tắt thiết bị.</p>
       </aside>
     </div>
   );

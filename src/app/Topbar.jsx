@@ -6,10 +6,11 @@ export function Topbar({ page, authenticated, setTheme, theme, setPage, setLogin
   return (
     <header className="topbar">
       <span className="breadcrumb">
-        Không gian cá nhân <ChevronRight size={14} />
-        <strong>{navigation.find((item) => item.id === page).label}</strong>
+        <span className="breadcrumb-label">Lock Gold Free</span> <ChevronRight size={14} />
+        <strong>{navigation.find((item) => item.id === page)?.label || "Tính năng miễn phí"}</strong>
       </span>
       <div className="topbar-actions">
+        <button className="topbar-free" onClick={() => setPage("guide")} aria-label="Tính năng miễn phí"><span>✦</span><span>Miễn phí</span></button>
         <span className={`connection ${authenticated ? "online" : ""}`}>
           <span className="tiny-dot" />
           {authenticated ? "Đã kết nối" : "Chưa kết nối"}

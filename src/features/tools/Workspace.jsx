@@ -20,8 +20,8 @@ export function Workspace({
     ) || operations[0];
   if (!current)
     return (
-      <Empty icon={SlidersHorizontal} title="Chưa có thao tác khả dụng">
-        Danh mục thao tác sẽ xuất hiện khi máy chủ kết nối.
+      <Empty icon={SlidersHorizontal} title="Chưa tìm thấy tiện ích phù hợp">
+        Bạn thử tìm bằng một từ khác nhé.
       </Empty>
     );
   const key = `${current.group}.${current.method}`;
@@ -31,6 +31,7 @@ export function Workspace({
         <label className="field operation-select">
           <span>{initialLabel}</span>
           <select
+            aria-label={initialLabel}
             value={key}
             onChange={(event) => setSelected(event.target.value)}
           >
@@ -52,6 +53,7 @@ export function Workspace({
       <label className="field operation-select">
         <span>{initialLabel}</span>
         <select
+          aria-label={initialLabel}
           value={key}
           onChange={(event) => setSelected(event.target.value)}
         >
@@ -60,7 +62,7 @@ export function Workspace({
               key={`${operation.group}.${operation.method}`}
               value={`${operation.group}.${operation.method}`}
             >
-              {operation.label} — {operation.group}.{operation.method}
+              {operation.label}
             </option>
           ))}
         </select>

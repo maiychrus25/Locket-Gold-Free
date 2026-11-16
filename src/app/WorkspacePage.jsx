@@ -1,11 +1,12 @@
 import React from "react";
 import { navigation } from "./navigation.js";
 import { LockKeyhole, UserRound, LogOut, Search } from "lucide-react";
-import { Raw } from "../components/Raw.jsx";
 import { FriendsPanel } from "../features/friends/FriendsPanel.jsx";
 import { ChatPanel } from "../features/chat/ChatPanel.jsx";
 import { LiveChat } from "../features/chat/LiveChat.jsx";
 import { Workspace } from "../features/tools/Workspace.jsx";
+import { ProfilePanel } from "../features/profile/ProfilePanel.jsx";
+import { AppearanceSettings } from "../features/profile/AppearanceSettings.jsx";
 
 export function WorkspacePage({
   page,
@@ -18,12 +19,13 @@ export function WorkspacePage({
   filter,
   setFilter,
   workspaceProps,
+  appearance,
 }) {
   return (
     <section className="panel tools-panel">
       <div className="section-heading">
         <h2>{navigation.find((item) => item.id === page).label}</h2>
-        <span className="badge">{relevant(page).length} thao tác</span>
+        <span className="free-label">Miễn phí</span>
       </div>
       {!authenticated && (
         <div className="connect-strip">
@@ -47,9 +49,6 @@ export function WorkspacePage({
           </div>
           <div>
             <h3>{session.user?.email || "Tài khoản của bạn"}</h3>
-            <p className="muted">
-              UID: {session.user?.uid || "Không có thông tin"}
-            </p>
           </div>
           <button
             className="button secondary"
@@ -58,9 +57,10 @@ export function WorkspacePage({
             <LogOut size={16} />
             Đăng xuất
           </button>
-          {session.device && <Raw value={session.device} />}
         </div>
       )}
+      {page === "profile" && authenticated && <ProfilePanel session={session} workspaceProps={workspaceProps} />}
+      {page === "profile" && <AppearanceSettings {...appearance} />}
       {page === "friends" && authenticated && (
         <FriendsPanel confirmAction={confirmAction} />
       )}
@@ -73,23 +73,26 @@ export function WorkspacePage({
           <Search size={18} />
           <input
             aria-label="Tìm công cụ"
-            placeholder="Tìm tên tính năng, nhóm hoặc phương thức…"
+            placeholder="Tìm tiện ích cho ảnh và video…"
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
           />
         </label>
       )}
+      {page === "tools" && <>
       <Workspace
         key={`${page}-${authenticated}`}
         {...workspaceProps}
-        operations={relevant(page).filter(
+        initialLabel="Bạn muốn làm gì?"
+        operations={relevant(page).filter(operation => ["optimizeVideo", "extractThumbnail"].includes(operation.media)).map(operation => ({ ...operation, label: operation.media === "optimizeVideo" ? "Nén video" : "Tạo ảnh bìa video" })).filter(
           (operation) =>
             page !== "tools" ||
-            `${operation.label} ${operation.group} ${operation.method}`
+            operation.label
               .toLowerCase()
               .includes(filter.toLowerCase()),
         )}
       />
+      </>}
     </section>
   );
 }

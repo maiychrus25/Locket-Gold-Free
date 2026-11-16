@@ -40,3 +40,24 @@ test("late 401 from an old session cannot expire the new login", async (t) => {
   assert.equal(getSessionGeneration(), "generation-2");
   assert.equal(expired, 0);
 });
+
+test("upstream failures show recovery guidance without exposing protocol details", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json({
+    error: "API request to postMomentV2 failed: Bad Gateway",
+    code: "UPSTREAM_UNAVAILABLE",
+    upstreamStatus: 502,
+    outcome: "unknown",
+  }, { status: 502 }));
+  await assert.rejects(request("/api/media/post", {}), {
+    message: "Kết nối đang gián đoạn. Nếu vừa gửi nội dung, hãy kiểm tra lại trước khi gửi lần nữa.",
+  });
+});
+
+test("a rejected custom color shows a human message instead of a validation expression", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json({
+    error: "textColor: Invalid string: must match pattern /^#[\\da-fA-F]{6}$/",
+  }, { status: 400 }));
+  await assert.rejects(request("/api/media/post", {}), {
+    message: "Chưa thực hiện được. Bạn kiểm tra thông tin rồi thử lại nhé.",
+  });
+});

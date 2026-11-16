@@ -1,6 +1,6 @@
 # Account-facing API coverage
 
-Pinned dependency: `locket.js@0.0.3`. Every account-facing prototype method is checked by `tests/coverage.test.js`. All listed operations are accessible through advanced tools; daily workflows also have dedicated screens.
+Pinned dependency: `locket.js@0.0.3`. Every account-facing prototype method is checked by `tests/coverage.test.js`. All listed operations remain accessible through the validated backend. Consumer screens expose named daily actions and media utilities; raw protocol forms, identifiers and JSON responses are intentionally absent from the UI at the operator's request.
 
 | SDK operation | Website action | Transport |
 | --- | --- | --- |

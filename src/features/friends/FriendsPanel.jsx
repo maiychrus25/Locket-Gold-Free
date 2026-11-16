@@ -2,9 +2,9 @@ import React from "react";
 import { useOperation } from "../../lib/useOperation.js";
 import { useState, useEffect } from "react";
 import { request, records } from "../../lib/api.js";
-import { unwrap, personName, identity, imageUrl } from "../../lib/data.js";
+import { unwrap, identity, imageUrl } from "../../lib/data.js";
 import { Search, UserPlus, RefreshCw, Users, Check } from "lucide-react";
-import { Details } from "../../components/Details.jsx";
+import { friendName } from "../feed/FriendSelect.jsx";
 import { Feedback } from "../../components/Feedback.jsx";
 
 export function FriendsPanel({ confirmAction }) {
@@ -37,7 +37,7 @@ export function FriendsPanel({ confirmAction }) {
     });
     if (result) {
       await load();
-      state.setNotice("Máy chủ đã xác nhận thao tác bạn bè.");
+      state.setNotice("Đã cập nhật bạn bè.");
     }
   }
   let people = records(payload);
@@ -87,7 +87,7 @@ export function FriendsPanel({ confirmAction }) {
       </form>
       {lookup && (
         <div className="person-card">
-          <h3>{personName(lookup)}</h3>
+          <h3>{friendName(lookup)}</h3>
           <button
             className="button secondary"
             disabled={state.pending || !lookup.uid}
@@ -101,7 +101,6 @@ export function FriendsPanel({ confirmAction }) {
             <UserPlus size={15} />
             Gửi lời mời
           </button>
-          <Details value={lookup} />
         </div>
       )}
       <div className="tabs" aria-label="Danh sách bạn bè">
@@ -123,11 +122,11 @@ export function FriendsPanel({ confirmAction }) {
           </button>
         ))}
       </div>
-      <Feedback state={state} />
+      <Feedback state={{ ...state, error: state.error ? "Chưa hoàn tất yêu cầu. Hãy kiểm tra lại trước khi thử lại." : "" }} />
       <div className="daily-toolbar">
         <h3>
           {people.length
-            ? `${people.length} mục được trả về`
+            ? `${people.length} bạn bè và lời mời`
             : "Vòng tròn của bạn"}
         </h3>
         <button
@@ -143,7 +142,7 @@ export function FriendsPanel({ confirmAction }) {
         <div className="empty">
           <Users size={30} />
           <h3>Chưa có mục nào để hiển thị</h3>
-          <p>Tìm bạn mới hoặc kiểm tra dữ liệu nhóm bên dưới.</p>
+          <p>Tìm bạn mới để cùng chia sẻ những khoảnh khắc.</p>
         </div>
       )}
       <div className="people-list">
@@ -156,16 +155,17 @@ export function FriendsPanel({ confirmAction }) {
               <div className="person-heading">
                 {avatar ? <img src={avatar} alt="" /> : <Users size={25} />}
                 <div>
-                  <strong>{personName(user)}</strong>
+                  <strong>{friendName(user)}</strong>
                   <small>
                     {{
                       incoming: "Lời mời đến",
+                      incoming_requests: "Lời mời đến",
+                      outgoing_requests: "Lời mời đã gửi",
                       outgoing: "Lời mời đã gửi",
                       received: "Lời mời đến",
                       sent: "Lời mời đã gửi",
                     }[person.requestDirection] ||
-                      person.requestDirection ||
-                      uid}
+                      "Bạn bè"}
                   </small>
                 </div>
               </div>
@@ -215,12 +215,10 @@ export function FriendsPanel({ confirmAction }) {
                   Bỏ chặn
                 </button>
               </div>
-              <Details value={person} />
             </article>
           );
         })}
       </div>
-      {payload !== null && <Details value={payload} />}
     </>
   );
 }

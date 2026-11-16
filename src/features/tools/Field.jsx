@@ -1,8 +1,15 @@
 import React, { useId } from "react";
 import { RecipientField } from "../moments/RecipientField.jsx";
 
-export function Field({ field, value, change, disabled }) {
+export function Field({ field, value, change, disabled, authenticated }) {
   const id = useId();
+  const labels = {
+    targetSizeBytes: "Độ gọn video",
+    maxDimension: "Độ nét video",
+    preserveResolution: "Ưu tiên giữ độ nét",
+    timestampSec: "Chọn khung hình tại giây",
+  };
+  if (labels[field.name]) field = { ...field, label: labels[field.name] };
   const props = {
     id,
     disabled,
@@ -10,6 +17,17 @@ export function Field({ field, value, change, disabled }) {
     value: value ?? "",
     onChange: (event) => change(event.target.value),
   };
+  if (["targetSizeBytes", "maxDimension"].includes(field.name)) {
+    const choices = field.name === "targetSizeBytes"
+      ? [[2000000, "Gọn nhẹ"], [4000000, "Cân bằng"], [5650000, "Nhiều chi tiết"]]
+      : [[720, "HD"], [1080, "Full HD"], [1440, "2K"], [2160, "4K"]];
+    return <div className="field">
+      <label htmlFor={id}>{field.label}</label>
+      <select {...props} onChange={event => change(Number(event.target.value))}>
+        {choices.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+      </select>
+    </div>;
+  }
   if (field.name === "colors") {
     let colors = [];
     try {
@@ -50,8 +68,14 @@ export function Field({ field, value, change, disabled }) {
       </fieldset>
     );
   }
+  if (field.name === "textColor")
+    return <div className="field">
+      <label htmlFor={id}>Màu chữ</label>
+      <input {...props} type="color" value={/^#[\da-fA-F]{6}$/.test(value || "") ? value : "#ffffff"} />
+      <button type="button" className="text-link" disabled={disabled} onClick={() => change("")}>Dùng màu chữ của mẫu</button>
+    </div>;
   if (field.name === "recipients")
-    return <RecipientField value={value} change={change} disabled={disabled} />;
+    return <RecipientField value={value} change={change} disabled={disabled} authenticated={authenticated} />;
   if (field.type === "checkbox")
     return (
       <label className="checkbox" htmlFor={id}>
@@ -92,6 +116,7 @@ export function Field({ field, value, change, disabled }) {
         <textarea
           {...props}
           rows={field.type === "json" ? 4 : 3}
+          maxLength={field.name === "caption" ? 2000 : undefined}
           spellCheck={field.type !== "json"}
           placeholder={
             field.type === "json"

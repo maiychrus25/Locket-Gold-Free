@@ -1,7 +1,7 @@
 # Lock Gold Free — system documentation
 
 Version: 0.1.0
-Status: Development; live Locket interoperability unverified
+Status: Development; live web Locket interoperability unverified
 
 <!-- docs-check: API coverage is verified against shared/operations.js -->
 
@@ -20,7 +20,7 @@ Open http://127.0.0.1:4317. Override the local port with `PORT`. The server bind
 
 React renders the website; Vite builds browser assets to `dist/`. Express serves the API and prebuilt assets. `locket.js@0.0.3` handles the private Locket/Firebase protocol; the lockfile fixes the exact installed dependency graph. Zod validates the operation contract; Multer bounds multipart inputs; Helmet supplies response security headers; Lucide supplies icons. Sharp and ws are reused through the SDK. No Python service, database, client state framework, or custom media codec is added.
 
-`shared/operations.js` is the single allowlist and form metadata source. Main screens use dedicated everyday flows; advanced tools cover all other supported operations. The account-facing API inventory and exclusions are in [api-coverage.md](docs/api-coverage.md).
+`shared/operations.js` is the single allowlist and form metadata source. Main screens use dedicated everyday flows; utilities expose video compression and thumbnail extraction. The backend retains all supported operations; technical protocol controls are not part of the consumer UI. The account-facing API inventory and exclusions are in [api-coverage.md](docs/api-coverage.md).
 
 The application layout is documented in [architecture.md](docs/architecture.md). `src/main.jsx` bootstraps `src/app/App.jsx`; feature panels, shared UI, browser helpers and styles have separate directories. `server/app.js` composes middleware, session lifecycle and five route modules. SDK integration and the isolated media worker live in `server/services/locket/`. Capability descriptors live under `shared/operations/`; the registry keeps its existing exports and ordering. The refactor adds no dependencies and preserves the HTTP/UI contracts except the documented transient-error metadata below.
 
@@ -82,6 +82,24 @@ npm run test:browser -- --repeat-each=2
 The test-only browser harness (`tests/browser-server.js`) rewrites known dependency hosts to that local simulation and refuses unmodeled external hosts. This rewrite is never imported by the normal server. Browser projects cover desktop/mobile and light/dark; both repetitions must pass. See [verification.md](docs/verification.md) for observed results and limits.
 
 ## References and post-release notes
+
+### Free experience refresh · 2026-11-16
+
+The operator confirmed successful publishing in the official mobile app. This supersedes treating the earlier gateway observation as a continuing global outage; authenticated web interoperability remains unverified. Read [product research](docs/locket-features.md) for primary sources and the feature-by-feature boundary.
+
+The web app charges nothing: no billing flow, advertisement, subscription check or artificial 20-friend cap. It reuses all 53 allowlisted SDK operations. Provider-enforced account restrictions still apply; native icons/widgets, official Gold badges, streak restoration, music-provider linking and Rollcall publishing are not implemented by this SDK and are not presented as unlocked.
+
+The creator now includes media/caption preview, visual caption presets and explicit camera capture. Camera permissions are requested only after an action; closing, navigating away or changing account stops media tracks. Late permission/capture results cannot overwrite a newer draft. Captions are sent as metadata, not burned into uploaded image bytes. Local browser capture records video without audio; uploading an existing video preserves the existing audio/compression options. Input files remain limited to 32 MiB. Selected recipients, private mode, video covers and all advanced controls remain available.
+
+Feed cards offer emoji reactions, a viewer dialog and list/grid layouts. History date/month filters apply only to the current returned page and are labeled accordingly. Existing cursor and verified-author rules remain. Rollcall reads use the ISO week-year of the selected date; the web app does not publish Rollcall collections.
+
+The profile page has a structured editor, avatar upload through the existing operation, and browser appearance settings. Theme and accent names are the only additional localStorage preferences (`lock-accent`: sunshine/rose/ocean); no account data, drafts or credentials are persisted there. Profile drafts reuse the session-owned draft store, send only edited nonempty fields, and cannot be cleared by an older completed save. No server route, validation contract, session lifetime or SDK version changes are introduced by the UI refresh.
+
+The operator subsequently required a consumer-only presentation. Raw JSON renderers and protocol/device disclosures are removed. User-visible selectors use friend names and moment captions rather than identifiers; API identifiers remain internal. The old advanced-forms destination is replaced by useful media utilities, and all 53 backend operations remain allowlisted. Viewer counts/names are displayed only when recognized; unknown response shapes show a plain unavailable state. Technical research and unsupported official features belong in documentation, not in the consumer feature guide. Upstream 5xx responses become recovery guidance without protocol names, status codes or validation expressions; network and malformed responses also have plain-language messages. The HTTP response contract itself is unchanged.
+
+Preset selection no longer copies SDK styling into request override fields. Of 158 current presets, 79 have eight-digit RGBA text colors, which are valid defaults in the SDK but incompatible with the unchanged six-digit custom-color validator. Selecting a chip or dropdown value clears custom overrides and sends the preset identifier; preview accepts preset alpha colors. Custom colors use a native color picker. Every catalog preset is tested with the real parser and server validator; invalid legacy overrides remain subject to validation rather than weakening the boundary.
+
+### Earlier source-publication observations
 
 - Primary dependency: https://github.com/hmkk69/locket.js (MIT), npm version 0.0.3.
 - Additional reference requested by the operator: https://github.com/leanhminh2104/locketlam (MIT). The Python repository was read without installing/executing it; its examples were used to cross-check media priorities, custom thumbnail, caption styling, private recipients and chat read-receipt behavior. No Python code was copied or service added.

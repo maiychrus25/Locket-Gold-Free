@@ -7,7 +7,7 @@ export function MainFooter() {
       <span>
         <Heart size={13} /> Những điều nhỏ làm nên kết nối lớn.
       </span>
-      <span>Lock Gold Free · Không cung cấp mở khóa thuê bao Gold</span>
+      <span>Lock Gold Free · Miễn phí mọi công cụ trên web</span>
     </footer>
   );
 }

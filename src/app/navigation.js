@@ -35,7 +35,7 @@ export const navigation = [
   },
   {
     id: "tools",
-    label: "Công cụ nâng cao",
+    label: "Tiện ích",
     icon: SlidersHorizontal,
   },
 ];
@@ -58,10 +58,14 @@ export const titles = {
   ],
   profile: [
     "Không gian của riêng bạn.",
-    "Chỉnh sửa hồ sơ và thiết lập thiết bị kết nối.",
+    "Chỉnh sửa hồ sơ và chọn giao diện theo ý bạn.",
   ],
   tools: [
-    "Nhiều cách hơn để kết nối.",
-    "Toàn bộ thao tác được hỗ trợ, trực tiếp từ danh mục máy chủ.",
+    "Một chút chăm chút trước khi gửi.",
+    "Nén video và chọn ảnh bìa cho những khoảnh khắc của bạn.",
+  ],
+  guide: [
+    "Một không gian. Không paywall.",
+    "Thêm cách chia sẻ, thêm gần gũi. Tất cả đều miễn phí.",
   ],
 };

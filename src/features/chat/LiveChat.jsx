@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getSessionGeneration, sanitize } from "../../lib/api.js";
 import { Radio } from "lucide-react";
-import { Result } from "../../components/Result.jsx";
+import { FriendSelect } from "../feed/FriendSelect.jsx";
 
 export function LiveChat({ authenticated }) {
   const [userId, setUserId] = useState("");
@@ -10,6 +10,7 @@ export function LiveChat({ authenticated }) {
   const [events, setEvents] = useState([]);
   useEffect(() => {
     if (!active || !authenticated) return;
+    let cancelled = false;
     const generation = getSessionGeneration();
     const stream = new EventSource(
       `/api/chat/events?otherUserId=${encodeURIComponent(active)}&generation=${encodeURIComponent(generation || "")}`,
@@ -18,25 +19,28 @@ export function LiveChat({ authenticated }) {
       },
     );
     stream.onopen = () => {
-      if (getSessionGeneration() === generation) setStatus("Đang kết nối…");
+      if (!cancelled && getSessionGeneration() === generation) setStatus("Đang kết nối…");
       else stream.close();
     };
     stream.addEventListener("message", (event) => {
-      if (getSessionGeneration() !== generation) {
+      if (cancelled || getSessionGeneration() !== generation) {
         stream.close();
         return;
       }
       try {
-        setEvents((previous) => [
-          ...previous.slice(-99),
-          sanitize(JSON.parse(event.data)),
-        ]);
+        const data = sanitize(JSON.parse(event.data));
+        const text = data?.text || data?.message?.text || data?.message;
+        if (typeof text === "string" && text.trim()) {
+          setEvents(previous => [...previous.slice(-99), text]);
+        } else {
+          setStatus("Có cập nhật mới. Mở lịch sử trò chuyện để xem.");
+        }
       } catch {
-        setStatus("Nhận được dữ liệu không hợp lệ");
+        setStatus("Chưa hiển thị được tin nhắn mới. Hãy mở lịch sử trò chuyện.");
       }
     });
     stream.addEventListener("status", (event) => {
-      if (getSessionGeneration() !== generation) {
+      if (cancelled || getSessionGeneration() !== generation) {
         stream.close();
         return;
       }
@@ -48,19 +52,18 @@ export function LiveChat({ authenticated }) {
             connected: "Đã kết nối",
             reconnecting: "Đang kết nối lại…",
           }[data.state] ||
-            (typeof data.status === "string"
-              ? data.status
-              : "Đã nhận trạng thái kết nối"),
+            "Đang chờ tin nhắn mới",
         );
       } catch {
-        setStatus("Đã nhận trạng thái kết nối");
+        setStatus("Đang chờ tin nhắn mới");
       }
     });
     stream.onerror = () => {
+      if (cancelled || getSessionGeneration() !== generation) return;
       setStatus("Kết nối gián đoạn. Dừng và kết nối lại để tiếp tục.");
       stream.close();
     };
-    return () => stream.close();
+    return () => { cancelled = true; stream.close(); };
   }, [active, authenticated]);
   return (
     <section className="live-chat">
@@ -80,17 +83,10 @@ export function LiveChat({ authenticated }) {
           setActive(userId.trim());
         }}
       >
-        <input
-          aria-label="UID người trò chuyện"
-          required
-          placeholder="UID người bạn muốn trò chuyện"
-          value={userId}
-          onChange={(event) => setUserId(event.target.value)}
-          disabled={Boolean(active)}
-        />
+        <FriendSelect label="Người bạn trò chuyện trực tiếp" value={userId} onChange={setUserId} disabled={!authenticated || Boolean(active)} />
         <button
           className="button secondary"
-          disabled={!authenticated || Boolean(active)}
+          disabled={!authenticated || !userId || Boolean(active)}
         >
           Kết nối
         </button>
@@ -108,10 +104,10 @@ export function LiveChat({ authenticated }) {
         )}
       </form>
       {events.length > 0 ? (
-        <Result value={events} />
+        <div className="message-list" aria-live="polite">{events.map((text, index) => <article className="message" key={index}><p>{text}</p></article>)}</div>
       ) : (
         <p className="muted">
-          Tin nhắn mới sẽ xuất hiện tại đây khi luồng trực tiếp được kết nối.
+          Tin nhắn mới sẽ xuất hiện tại đây khi bạn bật trò chuyện trực tiếp.
         </p>
       )}
     </section>

@@ -13,9 +13,13 @@ import {
   Check,
   ChevronRight,
   LockKeyhole,
+  Crown,
+  CalendarHeart,
+  Video,
+  Eye,
 } from "lucide-react";
 import { FeedPanel } from "./FeedPanel.jsx";
-import { Workspace } from "../tools/Workspace.jsx";
+import { RollcallPanel } from "./RollcallPanel.jsx";
 import { Empty } from "../../components/Empty.jsx";
 
 export function HomePage({
@@ -28,15 +32,14 @@ export function HomePage({
   setFeedTab,
   session,
   confirmAction,
-  workspaceProps,
-  relevant,
 }) {
   return (
     <>
-      <section className="welcome-card">
+      <div className="journal-meta"><span>{new Intl.DateTimeFormat("vi-VN", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</span><span><span className="tiny-dot" /> A LITTLE CLOSER, EVERY DAY</span></div>
+      <section className={`welcome-card ${authenticated ? "connected-welcome" : ""}`}>
         <div className="welcome-copy">
           <span className="pill">
-            <Sparkles size={14} /> MỘT CHÚT NẮNG CHO NGÀY MỚI
+            <Sparkles size={14} /> KHOẢNH KHẮC NHỎ. KẾT NỐI THẬT.
           </span>
           <h2>
             Khoảnh khắc của bạn.
@@ -46,7 +49,7 @@ export function HomePage({
           <p>
             Đăng ảnh, gửi lời thương và kết nối với bạn bè.
             <br className="desktop-break" />
-            Tất cả trong một góc nhỏ, dành riêng cho bạn.
+            Tất cả miễn phí, trong một góc nhỏ dành riêng cho bạn.
           </p>
           <button
             className="button dark"
@@ -58,7 +61,7 @@ export function HomePage({
             <ArrowUpRight size={17} />
           </button>
           <span className="welcome-foot">
-            <ShieldCheck size={14} /> Riêng tư, đơn giản và thân thuộc
+            <ShieldCheck size={14} /> Không quảng cáo · Không paywall
           </span>
         </div>
         <div className="hero-art" aria-hidden="true">
@@ -91,7 +94,7 @@ export function HomePage({
           {
             icon: Camera,
             label: "Khoảnh khắc",
-            text: "Lưu lại điều đáng nhớ",
+            text: "Ảnh, video & chú thích",
             action: "compose",
           },
           {
@@ -123,6 +126,7 @@ export function HomePage({
           </button>
         ))}
       </div>
+      <div className="quick-create-strip" aria-label="Lối tắt khoảnh khắc"><span>Lưu lại hôm nay</span><button onClick={() => setPage("compose")}><Camera size={17} />Ảnh từ thư viện</button><button onClick={() => setPage("compose")}><Video size={17} />Video & ảnh bìa</button><button onClick={() => setFeedTab("history")}><CalendarHeart size={17} />Kỷ niệm</button><button onClick={() => setPage("guide")}><Crown size={17} />Tất cả tính năng</button></div>
       <div className="home-columns">
         <section className="panel feed-panel">
           <div className="section-heading">
@@ -156,24 +160,16 @@ export function HomePage({
             >
               Lịch sử của tôi
             </button>
+            <button role="tab" aria-selected={feedTab === "rollcall"} className={feedTab === "rollcall" ? "selected" : ""} onClick={() => setFeedTab("rollcall")}>Rollcall</button>
           </div>
           {authenticated ? (
             <>
-              <FeedPanel
+              {feedTab === "rollcall" ? <RollcallPanel /> : <FeedPanel
                 key={feedTab}
                 tab={feedTab}
                 userUid={session.user?.uid}
                 confirmAction={confirmAction}
-              />
-              <details className="advanced-disclosure">
-                <summary>
-                  Thao tác bảng tin khác · lượt xem, bình luận, bộ lọc
-                </summary>
-                <Workspace
-                  {...workspaceProps}
-                  operations={relevant("home")}
-                />
-              </details>
+              />}
             </>
           ) : (
             <Empty icon={Camera} title="Những khoảnh khắc đang chờ bạn">
@@ -190,6 +186,7 @@ export function HomePage({
           )}
         </section>
         <aside className="home-aside">
+          <section className="gold-free-card"><span className="gold-card-symbol"><Crown size={25} /></span><span className="section-kicker">GOLD IN SPIRIT. FREE TO USE.</span><h3>Nhiều cách hơn<br />để gần nhau.</h3><p>Đăng từ thư viện, video, nhãn chú thích và lượt xem. Mọi công cụ trên web đều miễn phí.</p><div className="gold-card-icons" aria-hidden="true"><Camera size={18} /><Video size={18} /><Eye size={18} /><Heart size={18} /></div><button className="button primary" onClick={() => setPage("guide")}>Khám phá tính năng<ArrowUpRight size={16} /></button></section>
           <section className="panel getting-started">
             <div className="section-heading">
               <h3>Một khởi đầu nhỏ</h3>

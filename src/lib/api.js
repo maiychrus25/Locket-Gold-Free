@@ -45,9 +45,13 @@ export async function request(path, body) {
           },
           body: body instanceof FormData ? body : JSON.stringify(body),
         }),
+  }).catch(() => {
+    throw new Error("Chưa kết nối được. Bạn kiểm tra mạng rồi thử lại nhé.");
   });
   const isJson = response.headers.get("content-type")?.includes("json");
-  const payload = isJson ? await response.json() : await response.blob();
+  const payload = isJson ? await response.json().catch(() => {
+    throw new Error("Chưa đọc được phản hồi. Nếu vừa gửi nội dung, hãy kiểm tra lại trước khi gửi lần nữa.");
+  }) : await response.blob();
   if (path !== "/api/catalog" && epoch !== sessionEpoch)
     throw new Error("Phiên đã thay đổi; phản hồi cũ đã được bỏ qua.");
   if (response.ok && path.startsWith("/api/auth/")) {
@@ -65,9 +69,11 @@ export async function request(path, body) {
   }
   if (!response.ok)
     throw new Error(
-      isJson
-        ? payload.error || `Yêu cầu thất bại (${response.status})`
-        : `Yêu cầu thất bại (${response.status})`,
+      response.status >= 500
+        ? "Kết nối đang gián đoạn. Nếu vừa gửi nội dung, hãy kiểm tra lại trước khi gửi lần nữa."
+        : isJson && typeof payload?.error === "string" && !/\b(?:API|SDK|JSON|UID|HTTP|token|password|cookie)\b|[a-z_]+[.:]\s*(?:Invalid|Expected|Unrecognized)/i.test(payload.error)
+          ? payload.error
+          : "Chưa thực hiện được. Bạn kiểm tra thông tin rồi thử lại nhé.",
     );
   return isJson ? sanitize(payload) : payload;
 }

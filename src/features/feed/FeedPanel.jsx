@@ -2,10 +2,12 @@ import React from "react";
 import { useOperation } from "../../lib/useOperation.js";
 import { useState, useRef, useEffect } from "react";
 import { request, records, safeUrl } from "../../lib/api.js";
-import { unwrap, postId, imageUrl, identity, personName } from "../../lib/data.js";
+import { unwrap, postId, imageUrl, identity } from "../../lib/data.js";
 import { RefreshCw, Search, Heart, Eye, Trash2, Send } from "lucide-react";
 import { Feedback } from "../../components/Feedback.jsx";
-import { Details } from "../../components/Details.jsx";
+import { momentDate, localDate } from "../../lib/memories.js";
+import { ViewsDialog } from "./ViewsDialog.jsx";
+import { FriendSelect, friendName } from "./FriendSelect.jsx";
 
 export function FeedPanel({ tab, confirmAction, userUid }) {
   const state = useOperation();
@@ -14,9 +16,14 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [comment, setComment] = useState({});
   const [cursor, setCursor] = useState("");
   const [filter, setFilter] = useState("");
+  const [layout, setLayout] = useState("grid");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [reactions, setReactions] = useState({});
+  const [viewing, setViewing] = useState(null);
   const filterRevision = useRef(0);
   async function load(next = false) {
-    const revision = filterRevision.current;
+    const revision = ++filterRevision.current;
     const result = await state.run(
       "moments",
       tab === "history" ? "getMoments" : "getLatest",
@@ -50,7 +57,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const reportError = state.setError;
   useEffect(() => {
     let cancelled = false;
-    const revision = filterRevision.current;
+    const revision = ++filterRevision.current;
     request(
       `/api/operations/moments/${tab === "history" ? "getMoments" : "getLatest"}`,
       tab === "history"
@@ -74,7 +81,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         }
       })
       .catch((error) => {
-        if (!cancelled) reportError(error.message);
+        if (!cancelled && revision === filterRevision.current) reportError(error.message);
       });
     return () => {
       cancelled = true;
@@ -83,11 +90,17 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   async function action(method, values) {
     const result = await state.run("moments", method, values);
     if (result) {
-      state.setNotice("Máy chủ đã xác nhận thao tác.");
+      state.setNotice("Đã cập nhật khoảnh khắc.");
       if (method === "delete") await load();
     }
   }
-  const items = records(payload);
+  const items = records(payload).filter(item => {
+    if (tab !== "history" || (!month && !day)) return true;
+    const date = momentDate(item);
+    if (!date) return false;
+    const key = localDate(date);
+    return (!month || key.startsWith(month)) && (!day || key === day);
+  });
   return (
     <div>
       <div className="daily-toolbar">
@@ -111,25 +124,30 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
             load();
           }}
         >
-          <input
-            aria-label="Lọc bảng tin theo UID"
-            placeholder="Lọc theo UID (không bắt buộc)"
-            value={filter}
-            disabled={state.pending}
-            onChange={(event) => {
+          <FriendSelect label="Khoảnh khắc của" emptyLabel="Của tôi" value={filter} disabled={state.pending}
+            onChange={value => {
               filterRevision.current++;
-              setFilter(event.target.value);
+              setFilter(value);
               setCursor("");
-            }}
-          />
+            }} />
           <button className="button secondary" disabled={state.pending}>
             <Search size={16} />
             Lọc
           </button>
         </form>
       )}
-      <Feedback state={state} />
-      {!loaded && state.pending && (
+      <div className="memory-controls" aria-label="Cách hiển thị">
+        <button className="button secondary" aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>Dạng lưới</button>
+        <button className="button secondary" aria-pressed={layout === "list"} onClick={() => setLayout("list")}>Dạng danh sách</button>
+      </div>
+      {tab === "history" && <div className="memory-filters">
+        <label>Tháng kỷ niệm<input type="month" value={month} onChange={event => { setMonth(event.target.value); setDay(""); }} /></label>
+        <label>Ngày kỷ niệm<input type="date" value={day} onChange={event => { setDay(event.target.value); setMonth(""); }} /></label>
+        <button className="button secondary" onClick={() => { setDay(""); setMonth(""); }}>Xoá bộ lọc ngày</button>
+        <p className="muted">Chỉ lọc các khoảnh khắc trên trang đã tải, không phải toàn bộ lịch sử. Ngày hiển thị theo múi giờ thiết bị.</p>
+      </div>}
+      <Feedback state={{ ...state, error: state.error ? "Chưa hoàn tất yêu cầu. Hãy kiểm tra lại trước khi thử lại." : "" }} />
+      {!loaded && !state.error && (
         <p role="status" className="muted">
           Đang tải khoảnh khắc…
         </p>
@@ -141,9 +159,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           <p>Khoảnh khắc được chia sẻ sẽ xuất hiện tại đây.</p>
         </div>
       )}
-      <div className="daily-grid">
+      <div className={`daily-grid memory-layout memory-${layout}`}>
         {items.map((item, index) => {
           const id = postId(item);
+          const date = momentDate(item);
           const video = safeUrl(
             item.video_url || item.videoUrl || item.video?.url,
           );
@@ -174,7 +193,8 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                 />
               ) : null}
               <div className="moment-body">
-                <h3>{personName(author)}</h3>
+                <h3>{friendName(author)}</h3>
+                {date ? <time className="muted" dateTime={date.toISOString()}>{date.toLocaleString("vi-VN")}</time> : <small className="muted">Chưa rõ thời gian</small>}
                 {typeof item.caption === "string" && <p>{item.caption}</p>}
                 <div className="action-row">
                   <button
@@ -203,6 +223,11 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                     <Eye size={14} />
                     Đã xem
                   </button>
+                  <select aria-label="Chọn cảm xúc" value={reactions[id] || "❤️"} onChange={event => setReactions(previous => ({ ...previous, [id]: event.target.value }))}>
+                    {["❤️", "😂", "🥰", "🔥", "👏", "😮"].map(emoji => <option key={emoji} value={emoji}>{emoji}</option>)}
+                  </select>
+                  <button className="button secondary" disabled={state.pending || !id} onClick={() => action("react", { momentUid: id, reaction: reactions[id] || "❤️", fromMemory: tab === "history" })}>Gửi cảm xúc</button>
+                  <button className="button secondary" disabled={!id} onClick={() => setViewing(id)}>Xem lượt xem</button>
                   {tab === "history" && authorUid && authorUid === userUid && (
                     <button
                       className="button secondary"
@@ -261,7 +286,6 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                     </button>
                   </form>
                 )}
-                <Details value={item} />
               </div>
             </article>
           );
@@ -276,7 +300,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           Trang tiếp theo
         </button>
       )}
-      {payload !== null && <Details value={payload} />}
+      {viewing && <ViewsDialog key={viewing} momentUid={viewing} close={() => setViewing(null)} />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { defaults, request, parseFields } from "../../lib/api.js";
+import { CaptionPresets, presetLabel, presetValues } from "../moments/CaptionPreview.jsx";
 import { MediaInput } from "../moments/MediaInput.jsx";
 import { Field } from "./Field.jsx";
 import { RefreshCw, ArrowUpRight, Download } from "lucide-react";
@@ -28,13 +29,15 @@ export function OperationForm({
     [download],
   );
   async function execute(body) {
+    if (operation.media && !files.length) {
+      setError("Vui lòng chọn ảnh hoặc video trước khi tiếp tục.");
+      return;
+    }
     setPending(true);
     setError("");
     try {
       let payload = body;
       if (operation.media) {
-        if (!files.length)
-          throw new Error("Vui lòng chọn ảnh hoặc video trước khi tiếp tục.");
         payload = new FormData();
         payload.append("options", JSON.stringify(body));
         for (const file of files)
@@ -76,6 +79,10 @@ export function OperationForm({
     }
     try {
       const body = parseFields(operation, values);
+      if (operation.media === "post" && body.isPrivate && body.recipients?.length) {
+        setError("Hãy bỏ chọn người nhận hoặc tắt “Chỉ mình tôi” trước khi đăng. Lựa chọn của anh vẫn được giữ lại.");
+        return;
+      }
       if (
         operation.destructive ||
         /delete|remove|block|recall|logout/i.test(operation.method)
@@ -83,7 +90,7 @@ export function OperationForm({
         setConfirm(body);
       else execute(body);
     } catch (failure) {
-      setError(failure.message);
+      setError(operation.media === "post" ? "Chưa thể đăng. Hãy kiểm tra lại chú thích và người nhận." : failure.message);
     }
   }
   return (
@@ -91,32 +98,16 @@ export function OperationForm({
       <form className="operation-form" onSubmit={submit}>
         <div className="operation-heading">
           <h3>{operation.label}</h3>
-          <code>
-            {operation.group}.{operation.method}
-          </code>
         </div>
         {operation.description && (
           <p className="muted">{operation.description}</p>
-        )}
-        {operation.media === "post" && values.caption && (
-          <div
-            className="caption-preview"
-            style={{
-              backgroundColor: /^#[\da-fA-F]{6}$/.test(values.textColor || "")
-                ? "var(--soft)"
-                : "var(--hero)",
-              color: /^#[\da-fA-F]{6}$/.test(values.textColor || "")
-                ? values.textColor
-                : undefined,
-            }}
-          >
-            {values.icon} {values.caption}
-          </div>
         )}
         <div className="fields">
           {operation.media && (
             <MediaInput
               operation={operation}
+              values={values}
+              presets={catalog.presets}
               files={files}
               setFiles={(next) =>
                 updateDraft({
@@ -128,6 +119,7 @@ export function OperationForm({
               disabled={pending}
             />
           )}
+          {operation.media === "post" && <CaptionPresets presets={catalog.presets} values={values} disabled={pending} onChange={(next) => updateDraft({ files, values: next })} />}
           {(operation.fields || []).map((original) => {
             const field =
               original.name === "noteType"
@@ -136,10 +128,7 @@ export function OperationForm({
                     type: "select",
                     options: catalog.presets.map((preset) => ({
                       ...preset,
-                      label: (preset.label || preset.value).replaceAll(
-                        "_",
-                        " ",
-                      ),
+                      label: presetLabel(preset),
                     })),
                   }
                 : original;
@@ -147,27 +136,29 @@ export function OperationForm({
               <Field
                 key={field.name}
                 field={field}
+                authenticated={authenticated}
                 value={values[field.name]}
                 disabled={pending}
                 change={(value) =>
                   updateDraft({
                     files,
-                    values: {
-                      ...values,
-                      [field.name]: value,
-                    },
+                    values: field.name === "noteType" && operation.media === "post"
+                      ? presetValues(values, value)
+                      : { ...values, [field.name]: value },
                   })
                 }
               />
             );
           })}
         </div>
+        {operation.media === "post" && values.isPrivate && <p className="notice">
+          Chế độ riêng tư không thể dùng cùng danh sách người nhận. Nếu đã chọn bạn bè, hãy bỏ chọn “Chỉ mình tôi” hoặc tự xóa người nhận trước khi đăng. Các lựa chọn của anh được giữ nguyên.
+        </p>}
         {operation.media &&
           /Video|Thumbnail/.test(operation.media) &&
           catalog.runtime?.ffmpeg === false && (
             <p className="notice">
-              Máy chủ chưa có FFmpeg. Một số thao tác video có thể không khả
-              dụng.
+              Xử lý video hiện chưa sẵn sàng. Bạn có thể thử lại sau.
             </p>
           )}
         {error && (
@@ -190,7 +181,7 @@ export function OperationForm({
         <span className="form-note">
           {operation.destructive
             ? "Thao tác cần xác nhận trước khi thực hiện."
-            : "Dữ liệu được gửi trực tiếp qua máy chủ của bạn."}
+            : "Chỉ chia sẻ khi bạn chọn gửi. Các công cụ đều miễn phí."}
         </span>
       </form>
       {result !== undefined && <Result value={result} />}

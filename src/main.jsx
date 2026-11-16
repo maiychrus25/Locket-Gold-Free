@@ -7,5 +7,8 @@ import "./styles/layout.css";
 import "./styles/components.css";
 import "./styles/responsive.css";
 import "./styles/custom-labels.css";
+import "./styles/creator.css";
+import "./styles/feed.css";
+import "./styles/experience.css";
 
 createRoot(document.getElementById("root")).render(<App />);

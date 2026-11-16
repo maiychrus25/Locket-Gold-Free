@@ -2,7 +2,9 @@
 
 A Vietnamese web workspace for Locket accounts, backed by `locket.js@0.0.3`: photo/video posting, feed/history, profile, friends, chat and advanced SDK tools. The name does not mean a paid Gold subscription is unlocked.
 
-Current limitation: the development machine observed HTTP 502 from the upstream Locket API on 2026-11-16. The website reports unconfirmed operations and preserves drafts; it does not automatically retry posts. Passing local simulations does not establish live provider availability.
+All website tools are free: no payments, paywalls or ads. The visual creator supports camera capture, local photos/videos, caption presets, recipients and video covers. Browse memories, view available viewers, read weekly Rollcall, manage your profile and choose light/dark appearance themes. Consumer screens use friend names and meaningful content, with no JSON output or protocol controls. All 53 SDK operations remain available through the validated backend. See [official-feature research and boundaries](docs/locket-features.md).
+
+Live web interoperability remains unverified. Earlier development probes returned upstream 502; the operator subsequently confirmed posting works in the official app. Failed web posts preserve drafts and are never automatically retried. Passing local simulations does not establish provider availability or unlock official Gold entitlements.
 
 ## Project structure
 
@@ -10,7 +12,7 @@ Current limitation: the development machine observed HTTP 502 from the upstream 
 src/
   app/                   app state, navigation and layout
   components/            reusable UI primitives
-  features/              auth, feed, friends, chat, moments, tools
+  features/              auth, feed, friends, chat, moments, profile, guide, tools
   lib/                   browser requests and data helpers
   styles/                tokens, base, layout, components, responsive rules
   main.jsx               React entry point

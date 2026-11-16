@@ -1,20 +1,19 @@
 import React from "react";
 import { records, safeUrl } from "../lib/api.js";
 import { Check } from "lucide-react";
-import { Raw } from "./Raw.jsx";
 
 export function Result({ value }) {
   const rows = records(value);
   return (
     <div className="result">
       <div className="result-heading">
-        <Check size={16} /> Máy chủ đã phản hồi
+        <Check size={16} /> Đã hoàn tất.
       </div>
       {rows.length > 0 && (
         <div className="result-list">
           {rows.map((item, index) => {
             if (!item || typeof item !== "object")
-              return <p key={index}>{String(item)}</p>;
+              return null;
             const picture = safeUrl(
               item.thumbnailUrl ||
                 item.thumbnail_url ||
@@ -27,9 +26,7 @@ export function Result({ value }) {
               item.displayName ||
               item.display_name ||
               item.username ||
-              item.name ||
-              item.uid ||
-              item.id;
+              item.name;
             return (
               <article className="record" key={item.id || index}>
                 {picture && <img src={picture} alt="" loading="lazy" />}
@@ -41,14 +38,12 @@ export function Result({ value }) {
                     "string" && (
                     <p>{item.caption || item.text || item.message}</p>
                   )}
-                  <Raw value={item} />
                 </div>
               </article>
             );
           })}
         </div>
       )}
-      <Raw value={value} />
     </div>
   );
 }

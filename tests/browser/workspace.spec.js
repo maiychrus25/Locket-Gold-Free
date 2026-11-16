@@ -10,8 +10,9 @@ const navigation = [
   "Bạn bè",
   "Tin nhắn",
   "Hồ sơ của tôi",
-  "Công cụ nâng cao",
+  "Tiện ích",
 ];
+const connectionError = "Kết nối đang gián đoạn. Nếu vừa gửi nội dung, hãy kiểm tra lại trước khi gửi lần nữa.";
 const png = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
   "base64",
@@ -175,28 +176,46 @@ test("login dialog supports keyboard, safe cookie and logout", async ({
   ).toBe(false);
 });
 
-test("every SDK operation is reachable through its typed tool form", async ({
+test("all 53 operations remain public while consumer pages expose two media utilities", async ({
   page,
 }) => {
   await signedIn(page);
-  await go(page, "Công cụ nâng cao");
   const catalog = await page.request
     .get("/api/catalog")
     .then((response) => response.json());
-  const select = page.locator(".operation-select select");
-  await expect(select.locator("option")).toHaveCount(catalog.operations.length);
+  expect(catalog.operations).toHaveLength(53);
+  expect(new Set(catalog.operations.map(operation => `${operation.group}.${operation.method}`)).size).toBe(53);
   for (const operation of catalog.operations) {
-    await select.selectOption(`${operation.group}.${operation.method}`);
-    if (operation.stream)
-      await expect(
-        page
-          .getByRole("heading", { name: "Tin nhắn trực tiếp", exact: true })
-          .first(),
-      ).toBeVisible();
-    else
-      await expect(page.locator(".operation-heading h3")).toHaveText(
-        operation.label,
-      );
+    expect(operation.group).toBeTruthy();
+    expect(operation.method).toBeTruthy();
+    expect(Array.isArray(operation.fields)).toBe(true);
+  }
+  for (const [destination, selector] of [
+    ["Tổng quan", () => page.getByRole("tab", { name: "Lịch sử của tôi", exact: true })],
+    ["Tạo khoảnh khắc", () => page.getByLabel("Chú thích", { exact: true })],
+    ["Bạn bè", () => page.getByRole("button", { name: "Tìm bạn", exact: true })],
+    ["Tin nhắn", () => page.getByRole("button", { name: "Gửi tin nhắn", exact: true })],
+    ["Hồ sơ của tôi", () => page.getByRole("button", { name: "Lưu hồ sơ", exact: true })],
+  ]) {
+    await go(page, destination);
+    await expect(selector()).toBeVisible();
+    await expect(page.locator("main")).not.toContainText(/\b(?:JSON|API|SDK|UID)\b/);
+    await noOverflow(page);
+  }
+  await go(page, "Tiện ích");
+  const select = page.getByLabel("Bạn muốn làm gì?", { exact: true });
+  await expect(select.locator("option")).toHaveText(["Tạo ảnh bìa video", "Nén video"]);
+  for (const [label, method] of [["Tạo ảnh bìa video", "extractThumbnail"], ["Nén video", "optimizeVideo"]]) {
+    await select.selectOption({ label });
+    await expect(page.getByRole("button", { name: label, exact: true })).toBeVisible();
+    await page.locator("input[type=file]").first().setInputFiles(videoPath);
+    const completed = page.waitForResponse(response => response.url().endsWith(`/api/media/${method}`));
+    const download = page.waitForEvent("download");
+    await page.getByRole("button", { name: label, exact: true }).click();
+    expect((await completed).status()).toBe(200);
+    await page.getByRole("link", { name: "Tải kết quả xuống", exact: true }).click();
+    expect(await (await download).failure()).toBeNull();
+    await expect(page.locator("main")).not.toContainText(/\b(?:JSON|API|SDK|UID)\b/);
     await noOverflow(page);
   }
 });
@@ -206,9 +225,7 @@ test("photo preview, private post and upstream-error retry preserve the draft", 
 }) => {
   await signedIn(page);
   await go(page, "Tạo khoảnh khắc");
-  await expect(page.locator(".operation-select select")).toHaveValue(
-    "moments.post",
-  );
+  await expect(page.getByRole("button", { name: "Đăng khoảnh khắc ảnh / video", exact: true })).toBeVisible();
   await page.locator("input[type=file]").first().setInputFiles({
     name: "snapshot.png",
     mimeType: "image/png",
@@ -226,10 +243,12 @@ test("photo preview, private post and upstream-error retry preserve the draft", 
       }),
     }),
   );
+  const failedPost = page.waitForResponse(response => response.url().endsWith("/api/media/post"));
   await page
     .getByRole("button", { name: "Đăng khoảnh khắc ảnh / video", exact: true })
     .click();
-  await expect(page.getByRole("alert")).toContainText("Fixture upstream");
+  expect((await failedPost).status()).toBe(502);
+  await expect(page.getByRole("alert")).toHaveText(connectionError);
   await expect(page.getByLabel("Chú thích", { exact: true })).toHaveValue(
     "Một ngày thật vui",
   );
@@ -248,7 +267,7 @@ test("photo preview, private post and upstream-error retry preserve the draft", 
   expect(body.data.sent_to_self_only).toBe(true);
   expect(body.data.sent_to_all).toBe(false);
   await expect(
-    page.getByText("Máy chủ đã phản hồi", { exact: false }).first(),
+    page.getByText("Đã hoàn tất.", { exact: true }).first(),
   ).toBeVisible();
   await noOverflow(page);
 });
@@ -256,22 +275,28 @@ test("photo preview, private post and upstream-error retry preserve the draft", 
 test("chat keeps failed text, sends successfully and loads real SDK local history", async ({
   page,
 }) => {
+  await page.route("**/api/operations/friends/getAllFriends", route => route.fulfill({
+    json: { data: [{ uid: "friend-user", displayName: "Linh", username: "linh" }] },
+  }));
   await signedIn(page);
   await go(page, "Tin nhắn");
-  await page.getByLabel("UID người nhận tin nhắn").fill("friend-user");
+  await page.locator(".chat-layout").getByRole("button", { name: "Chọn từ bạn bè", exact: true }).click();
+  await page.getByLabel("Người nhận tin nhắn", { exact: true }).selectOption({ label: "Linh" });
   const text = page.locator(".chat-layout textarea");
   await text.fill("trigger-upstream-error");
+  const failedMessage = page.waitForResponse(response => response.url().endsWith("/api/operations/chat/sendMessage"));
   await page.getByRole("button", { name: "Gửi tin nhắn", exact: true }).click();
-  await expect(page.getByRole("alert").first()).toContainText(
-    "Temporary upstream",
-  );
+  expect((await failedMessage).status()).toBe(502);
+  await expect(page.getByRole("alert").first()).toHaveText(connectionError);
   await expect(text).toHaveValue("trigger-upstream-error");
   await text.fill("Chào bạn từ Lock Gold Free");
   const sending = page.waitForResponse((response) =>
     response.url().endsWith("/api/operations/chat/sendMessage"),
   );
   await page.getByRole("button", { name: "Gửi tin nhắn", exact: true }).click();
-  expect((await sending).status()).toBe(200);
+  const sent = await sending;
+  expect(sent.status()).toBe(200);
+  expect(sent.request().postDataJSON()).toEqual({ receiverUid: "friend-user", text: "Chào bạn từ Lock Gold Free" });
   await expect(text).toHaveValue("");
   await expect(page.locator(".message").first()).toContainText(
     "Chào bạn từ Lock Gold Free",
@@ -283,17 +308,17 @@ test("session expiry hides account data and prompts reconnection", async ({
   page,
 }) => {
   await signedIn(page);
-  await go(page, "Công cụ nâng cao");
-  await page
-    .locator(".operation-select select")
-    .selectOption("user.getProfile");
+  await go(page, "Hồ sơ của tôi");
+  await page.getByLabel("Tên của bạn", { exact: true }).fill("Expired draft");
   await page.request.post("/api/auth/logout", {
     headers: { "X-Lock-Client": "web" },
     data: {},
   });
+  const expired = page.waitForResponse(response => response.url().endsWith("/api/operations/user/updateProfile"));
   await page
-    .getByRole("button", { name: "Xem hồ sơ theo UID", exact: true })
+    .getByRole("button", { name: "Lưu hồ sơ", exact: true })
     .click();
+  expect((await expired).status()).toBe(401);
   await expect(
     page
       .getByRole("button", { name: "Kết nối tài khoản", exact: true })
@@ -309,7 +334,7 @@ test("video accepts a custom thumbnail and compression priority", async ({
   await signedIn(page);
   await go(page, "Tạo khoảnh khắc");
   await page.locator("input[type=file]").first().setInputFiles(videoPath);
-  await expect(page.locator(".preview video")).toBeVisible();
+  await expect(page.locator(".creator-viewfinder video")).toBeVisible();
   await page
     .getByLabel("Ảnh bìa video riêng (tuỳ chọn)")
     .setInputFiles({ name: "cover.png", mimeType: "image/png", buffer: png });
@@ -499,14 +524,11 @@ test("an upstream publishing gateway error preserves the draft and warns about d
     upstreamStatus: 502,
     outcome: "unknown",
   });
-  await expect(page.getByRole("alert")).toContainText(
-    "Chưa xác nhận thao tác thành công",
-  );
-  await expect(page.getByRole("alert")).toContainText("kiểm tra lịch sử");
+  await expect(page.getByRole("alert")).toHaveText(connectionError);
   await expect(caption).toHaveValue("trigger-gateway-error");
   await expect(page.getByAltText("Xem trước khoảnh khắc")).toBeVisible();
   await expect(
-    page.getByText("Máy chủ đã phản hồi", { exact: false }),
+    page.getByText("Đã hoàn tất.", { exact: true }),
   ).toHaveCount(0);
   await page.waitForTimeout(200);
   expect(requests).toBe(1);

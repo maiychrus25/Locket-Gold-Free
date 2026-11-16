@@ -12,7 +12,7 @@ Separate the existing frontend screens, shared components, backend routes and SD
 src/
   app/                 application composition, navigation and layout
   components/          shared UI primitives
-  features/            auth, feed, friends, chat, moments and tools
+  features/            auth, feed, friends, chat, moments, profile, guide and tools
   lib/                 browser API client and data helpers
   styles/              tokens, foundation, layout, components and responsive rules
   main.jsx             React bootstrap only

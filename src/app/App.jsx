@@ -10,6 +10,7 @@ import { WorkspacePage } from "./WorkspacePage.jsx";
 import { MainFooter } from "./MainFooter.jsx";
 import { Modal } from "../components/Modal.jsx";
 import { Login } from "../features/auth/Login.jsx";
+import { FeatureGuide } from "../features/guide/FeatureGuide.jsx";
 
 export function App() {
   const sessionRevision = useRef(0);
@@ -29,6 +30,17 @@ export function App() {
     presets: [],
     reactions: [],
   });
+  const [accent, setAccent] = useState(() => {
+    try {
+      const value = localStorage.getItem("lock-accent");
+      return ["sunshine", "rose", "ocean"].includes(value) ? value : "sunshine";
+    } catch { return "sunshine"; }
+  });
+  useEffect(() => {
+    document.documentElement.dataset.accent = accent;
+    try { localStorage.setItem("lock-accent", accent); }
+    catch { /* Browser storage may be disabled. */ }
+  }, [accent]);
   const [session, setSession] = useState({
     authenticated: false,
   });
@@ -199,6 +211,7 @@ export function App() {
               catalog={catalog}
             />
           )}
+          {page === "guide" && <FeatureGuide setPage={setPage} />}
           {["friends", "chat", "profile", "tools"].includes(page) && (
             <WorkspacePage
               page={page}
@@ -211,6 +224,7 @@ export function App() {
               filter={filter}
               setFilter={setFilter}
               workspaceProps={workspaceProps}
+              appearance={{ theme, setTheme, accent, setAccent }}
             />
           )}
           <MainFooter />

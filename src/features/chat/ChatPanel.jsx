@@ -1,11 +1,11 @@
 import React from "react";
 import { useOperation } from "../../lib/useOperation.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { request, records } from "../../lib/api.js";
-import { unwrap, identity, personName } from "../../lib/data.js";
+import { unwrap, identity, postId } from "../../lib/data.js";
 import { RefreshCw, Heart, Send, Check } from "lucide-react";
 import { Feedback } from "../../components/Feedback.jsx";
-import { Details } from "../../components/Details.jsx";
+import { FriendSelect, friendName } from "../feed/FriendSelect.jsx";
 
 export function ChatPanel({ confirmAction }) {
   const state = useOperation();
@@ -15,6 +15,13 @@ export function ChatPanel({ confirmAction }) {
   const [conversationId, setConversationId] = useState("");
   const [text, setText] = useState("");
   const [momentUid, setMomentUid] = useState("");
+  const [sharedMoments, setSharedMoments] = useState(null);
+  const [profiles, setProfiles] = useState(() => new Map());
+  const rememberFriends = useCallback(people => {
+    const named = people.filter(person => typeof identity(person) === "string" && identity(person) && friendName(person) !== "Bạn bè");
+    setProfiles(previous => new Map([...previous, ...named.map(person => [identity(person), person])]));
+  }, []);
+  const recipient = profiles.get(otherUserId);
   async function loadConversations() {
     const result = await state.run("chat", "getConversations");
     if (result) setConversations(result.value);
@@ -29,10 +36,15 @@ export function ChatPanel({ confirmAction }) {
       .catch((error) => {
         if (!cancelled) reportError(error.message);
       });
+    request("/api/operations/friends/getAllFriends", {})
+      .then(response => {
+        if (!cancelled) rememberFriends(records(response).map(person => person.user || person));
+      })
+      .catch(error => { if (!cancelled) reportError(error.message); });
     return () => {
       cancelled = true;
     };
-  }, [reportError]);
+  }, [reportError, rememberFriends]);
   async function loadMessages(
     uid = otherUserId,
     conversation = conversationId,
@@ -57,7 +69,7 @@ export function ChatPanel({ confirmAction }) {
     const result = await state.run("chat", method, body);
     if (result) {
       await loadMessages();
-      state.setNotice("Máy chủ đã xác nhận thao tác tin nhắn.");
+      state.setNotice("Đã cập nhật tin nhắn.");
     }
   }
   return (
@@ -100,10 +112,7 @@ export function ChatPanel({ confirmAction }) {
                   loadMessages(uid, id);
                 }}
               >
-                {personName(
-                  conversation.other_user ||
-                    conversation.user || { uid: uid || id },
-                )}
+                {profiles.has(uid) ? friendName(profiles.get(uid)) : "Chưa rõ người nhận"}
                 <br />
                 <small>Mở trò chuyện →</small>
               </button>
@@ -111,7 +120,7 @@ export function ChatPanel({ confirmAction }) {
           })}
           {!records(conversations).length && (
             <p className="muted">
-              Chưa có hội thoại để hiển thị. Nhập UID để bắt đầu.
+              Chọn một người bạn để bắt đầu trò chuyện.
             </p>
           )}
         </div>
@@ -123,17 +132,13 @@ export function ChatPanel({ confirmAction }) {
               loadMessages();
             }}
           >
-            <input
-              aria-label="UID người nhận tin nhắn"
-              placeholder="UID người nhận"
-              value={otherUserId}
-              disabled={state.pending}
-              onChange={(event) => {
-                setOtherUserId(event.target.value);
+            <FriendSelect label="Người nhận tin nhắn" value={otherUserId} selectedPerson={recipient} onLoad={rememberFriends} disabled={state.pending}
+              onChange={(value, person) => {
+                if (person && identity(person) === value) rememberFriends([person]);
+                setOtherUserId(value);
                 setConversationId("");
                 setMessages(null);
-              }}
-            />
+              }} />
             <button
               className="button secondary"
               disabled={state.pending || (!otherUserId && !conversationId)}
@@ -141,6 +146,7 @@ export function ChatPanel({ confirmAction }) {
               Lịch sử
             </button>
           </form>
+          {otherUserId && !recipient && <p role="status">Chọn người nhận từ danh sách bạn bè trước khi gửi. Nội dung đang soạn vẫn được giữ lại.</p>}
           <div className="message-list" aria-live="polite">
             {records(messages).map((message, index) => {
               const id =
@@ -207,7 +213,6 @@ export function ChatPanel({ confirmAction }) {
                       Thu hồi
                     </button>
                   </div>
-                  <Details value={message} />
                 </article>
               );
             })}
@@ -218,6 +223,7 @@ export function ChatPanel({ confirmAction }) {
           <form
             onSubmit={async (event) => {
               event.preventDefault();
+              if (!recipient || state.pending) return;
               const result = await state.run(
                 "chat",
                 momentUid ? "sendMoment" : "sendMessage",
@@ -253,18 +259,22 @@ export function ChatPanel({ confirmAction }) {
               />
             </label>
             <label className="field">
-              <span>ID khoảnh khắc đính kèm (tuỳ chọn)</span>
-              <input
-                value={momentUid}
-                onChange={(event) => setMomentUid(event.target.value)}
-                placeholder="Chia sẻ một khoảnh khắc"
-              />
+              <span>Khoảnh khắc đính kèm (tuỳ chọn)</span>
+              <select value={momentUid} disabled={state.pending} onChange={event => setMomentUid(event.target.value)}>
+                <option value="">Không đính kèm</option>
+                {records(sharedMoments).filter(item => postId(item)).map((item, index) => <option key={postId(item)} value={postId(item)}>{typeof item.caption === "string" && item.caption ? item.caption : `Khoảnh khắc ${index + 1}`}</option>)}
+              </select>
             </label>
+            <button type="button" className="button secondary" disabled={state.pending} onClick={async () => {
+              const result = await state.run("moments", "getLatest");
+              if (result) setSharedMoments(result.value);
+            }}>Chọn khoảnh khắc</button>
+            {sharedMoments !== null && !records(sharedMoments).length && <p className="muted">Chưa có khoảnh khắc để chia sẻ.</p>}
             <div className="action-row">
               <button
                 className="button primary"
                 disabled={
-                  state.pending || !otherUserId || (!text.trim() && !momentUid)
+                  state.pending || !recipient || (!text.trim() && !momentUid)
                 }
               >
                 <Send size={16} />
@@ -294,8 +304,6 @@ export function ChatPanel({ confirmAction }) {
           </form>
         </div>
       </div>
-      {conversations !== null && <Details value={conversations} />}
-      {messages !== null && <Details value={messages} />}
     </>
   );
 }
