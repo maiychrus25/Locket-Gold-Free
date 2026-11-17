@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased — hardened VPS release
+## 2026-11-17 — hardened VPS release
 
 - Patched the SDK's shared image dependency to sharp 0.35.5 and normalized rejected avatar updates into safe API errors without retrying writes.
 - Added exact HTTPS production-origin validation, scoped proxy trust, production CSP and refusal of the Vite development server in production.
 - Added a pinned Linux runtime image and isolated VPS/HTTPS configuration; preserved existing consumer features and backend contracts apart from corrected avatar failure reporting.
+- Deployed the current free experience/mobile UI to reelsup.store with valid origin HTTPS, operator-configured Cloudflare Full (strict), scoped certificate renewal and no-transform ingress. Existing unrelated services/configuration were preserved.
 
 ## Unreleased — server readiness assessment
 

@@ -48,6 +48,6 @@ Post-release notes: 344 browser checks passed across two repetitions, four deskt
 
 ## Hardened VPS release · 2026-11-17
 
-Status: Origin deployed and verified; public edge awaits Cloudflare Full (strict)
+Status: Deployed and verified at https://reelsup.store; live authenticated Locket interoperability remains unverified
 
 The operator authorizes fixing the recorded blockers and deploying a prebuilt artifact to reelsup.store on the supplied VPS. Preserve every consumer feature and session/media boundary. Normalize failed avatar updates, patch the image dependency, require secure production startup, scope proxy trust to verified peers and preserve CSP compatibility with the existing creator. Package one isolated service with HTTPS, bounded resources, scoped logs/certificate renewal and a rollback path; preserve the target's unrelated services and data. Read [release evidence](verification/server-release.md) for the distinction between source checks, actual deployment checks and live provider interoperability. No guarantee of absolute security or unofficial subscription activation is made.

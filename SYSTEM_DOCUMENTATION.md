@@ -101,7 +101,7 @@ Fresh publication checks: `make test` twice, 37 passed/0 failed/0 skipped each; 
 
 ## Hardened VPS release · 2026-11-17
 
-Status: Origin container and HTTPS deployed and verified; public edge awaits Cloudflare Full (strict).
+Status: Deployed and verified at https://reelsup.store through Cloudflare Full (strict), confirmed by the operator.
 
 This follow-up supersedes the three unresolved application findings in the earlier assessment. The SDK stays at 0.0.3, while an npm override pins its shared sharp dependency to 0.35.5. Real ESM/CommonJS decoding, SDK avatar conversion and ffmpeg workers are checked on the pruned Linux runtime. Rejected avatar result envelopes now become sanitized exceptions with the provider status retained internally; the route returns its existing error response instead of a successful result. Successful avatar results retain their shape and writes are never retried automatically.
 
@@ -115,7 +115,9 @@ The immutable artifact is `lock-gold-free:20261117-cea769413051`, linux/amd64. I
 
 Only the prebuilt image and its deployment configuration bundle are transferred to production. `deploy/compose.yaml`, `deploy/nginx.conf` and the domain-scoped certificate renewal hook are the release inputs. The target has existing services and limited disk space; they are inventoried and kept separate. No production source checkout, on-host application build, database migration, global Docker prune or unrelated service restart is part of this release. Source publication and deployment are explicitly authorized by the operator. The release evidence and remaining limits are in [server-release verification](docs/verification/server-release.md).
 
-Origin deployment: `/opt/lock-gold-free/current` points to release `20261117-cea769413051`; Docker reports healthy, UID node, read-only root and only a host-loopback port. Both existing vhost hashes and all seven previous container IDs remained unchanged. The origin's valid public certificate expires 2027-02-15 and its scoped renewal hook reloads Nginx after renewal; existing logrotate includes the new vhost logs. Direct origin HTTPS/browser/API checks pass. Cloudflare currently forwards HTTPS visitors to origin HTTP, which returns a same-URL HTTPS redirect: the public edge is not usable until the operator sets SSL/TLS → Overview → Full (strict). The origin's HTTP listener serves ACME challenges and HTTPS redirects only, so credentials are never accepted over that HTTP listener.
+Origin deployment: `/opt/lock-gold-free/current` points to release `20261117-cea769413051`; Docker reports healthy, UID node, read-only root and only a host-loopback port. Both existing vhost hashes and all seven previous container IDs remained unchanged. The origin's valid public certificate expires 2027-02-15 and its scoped renewal hook reloads Nginx after renewal; the existing snap.certbot.renew.timer is active and the target-domain renewal dry run succeeded. Existing logrotate includes the new vhost logs. Direct origin HTTPS/browser/API checks pass. After the operator changed Cloudflare to Full (strict), public HTTPS returned 200 and the API/security/browser checks passed. The origin's HTTP listener serves ACME challenges and HTTPS redirects only, so credentials are never accepted over that HTTP listener.
+
+The ingress appends `Cache-Control: no-transform` while preserving upstream API `no-store` and asset caching. This stops Cloudflare's automatic analytics script injection, which otherwise conflicts with the intentional same-origin script policy. The public browser checks confirm that only the application's script is present and no CSP relaxation is needed. This behavior follows [Cloudflare's automatic-injection guidance](https://developers.cloudflare.com/web-analytics/get-started/).
 
 ## References and post-release notes
 

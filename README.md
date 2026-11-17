@@ -50,7 +50,7 @@ npm start
 
 ## Server readiness · 2026-11-17
 
-The following findings describe the initial review. They are corrected by the [hardened release](SYSTEM_DOCUMENTATION.md#hardened-vps-release--2026-11-17), whose origin is deployed at reelsup.store; public edge verification currently awaits Cloudflare Full (strict). See [release verification](docs/verification/server-release.md).
+The following findings describe the initial review. They are corrected by the [hardened release](SYSTEM_DOCUMENTATION.md#hardened-vps-release--2026-11-17), deployed and verified at **https://reelsup.store**. See [release verification](docs/verification/server-release.md) for checks and remaining live-account limits.
 
 Source publication is authorized; **public deployment readiness has not been established**. Passing local API/browser fixtures does not establish live Locket reliability.
 
