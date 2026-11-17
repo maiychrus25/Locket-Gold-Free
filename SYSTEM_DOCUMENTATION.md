@@ -123,7 +123,7 @@ The ingress appends `Cache-Control: no-transform` while preserving upstream API 
 
 ### Friend feed repair · 2026-11-17
 
-Status: Implemented in development; full regression verification and release pending.
+Status: Deployed and verified at https://reelsup.store. See [friend-feed evidence](docs/verification/friend-feed.md).
 
 The existing `moments.getLatest` operation now accepts optional `pageToken` (the existing identifier schema, at most 150 characters). An empty request retains the pinned SDK's original first-call behavior and the response remains an array under `data`, preserving other callers such as chat sharing. Continuation uses the fixed getLatestMomentV2 `sync_token` pattern already present in the SDK's shared-moment reader; this does not expose an arbitrary endpoint or raw HTTP proxy. Only valid array results or the known not-modified response end a continuation; malformed/provider failure envelopes become a safe error rather than a false empty feed. All 53 allowlisted operations and session/rate/redaction checks remain.
 

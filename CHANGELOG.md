@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased — friend feed repair
+## 2026-11-17 — friend feed repair
 
 - Resolve feed author UIDs through friend/self profiles while preserving unknown-history ownership restrictions.
 - Add backward-compatible latest-feed continuation and append/deduplicate older posts; preserve visible posts/cursors on errors and stop repeated pages.
 - Reuse existing SDK/session/UI patterns without adding dependencies or exposing technical identifiers.
+- Released to reelsup.store as a verified Linux image; prior release retained for rollback and unrelated services preserved.
 
 ## 2026-11-17 — hardened VPS release
 
