@@ -1,6 +1,6 @@
 # Verification record
 
-Latest: [mobile design verification](verification/mobile-design.md). Earlier: [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
+Latest: [hardened server release](verification/server-release.md). Earlier: [mobile design verification](verification/mobile-design.md), [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
 
 Status: Verified in local development on 2026-11-16. No public deployment.
 

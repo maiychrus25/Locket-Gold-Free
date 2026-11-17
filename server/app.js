@@ -1,5 +1,6 @@
 import express from "express";
 import { spawnSync } from "node:child_process";
+import { isIP } from "node:net";
 import { createSdkSession } from "./services/locket/client.js";
 import { isolatedMedia } from "./services/locket/media.js";
 import { installSecurity } from "./middleware/security.js";
@@ -16,10 +17,24 @@ export function createApp({
   mediaExecutor = isolatedMedia,
   clock = Date.now,
   allowedOrigin = process.env.APP_ORIGIN,
-  secureCookies = process.env.NODE_ENV === "production",
+  production = process.env.NODE_ENV === "production",
+  proxyAddress = process.env.TRUST_PROXY_IP,
+  secureCookies = production,
 } = {}) {
+  if (production) {
+    try {
+      const origin = new URL(allowedOrigin);
+      if (origin.protocol !== "https:" || origin.origin !== allowedOrigin)
+        throw new Error("Invalid public origin");
+    } catch {
+      throw new Error("Production requires APP_ORIGIN as an exact HTTPS origin without a path or credentials.");
+    }
+  }
+  if (proxyAddress && !isIP(proxyAddress))
+    throw new Error("TRUST_PROXY_IP must be one explicit trusted proxy IP address.");
   const app = express();
-  installSecurity(app, allowedOrigin);
+  if (production) app.set("trust proxy", proxyAddress ? ["loopback", proxyAddress] : "loopback");
+  installSecurity(app, allowedOrigin, { production });
   const lifecycle = createSessionLifecycle({ clock, secureCookies });
   app.locals.shutdown = lifecycle.shutdown;
   const ffmpeg =

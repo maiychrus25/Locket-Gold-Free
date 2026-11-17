@@ -28,10 +28,22 @@ export function hasUnsafeKeys(value) {
   );
 }
 
-export function installSecurity(app, allowedOrigin) {
+export function installSecurity(app, allowedOrigin, { production = false } = {}) {
   app.disable("x-powered-by");
   app.use(
-    helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }),
+    helmet({ contentSecurityPolicy: production ? { directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      scriptSrcAttr: ["'none'"],
+      styleSrc: ["'self'"],
+      styleSrcAttr: ["'unsafe-inline'"],
+      imgSrc: ["'self'", "https:", "data:", "blob:"],
+      mediaSrc: ["'self'", "https:", "blob:"],
+      connectSrc: ["'self'"],
+      frameAncestors: ["'none'"],
+      formAction: ["'self'"],
+      objectSrc: ["'none'"],
+    } } : false, crossOriginEmbedderPolicy: false }),
   );
   app.use("/api", (_req, res, next) => {
     res.set("Cache-Control", "no-store");

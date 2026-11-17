@@ -8,6 +8,27 @@ import { createSdkSession } from "../server/services/locket/client.js";
 import { isolatedMedia, applyWorkerResult } from "../server/services/locket/media.js";
 import { executeMedia } from "../server/services/locket/media-worker.js";
 
+test("avatar rejection becomes a safe upstream error without retrying the write", async () => {
+  let calls = 0;
+  const client = { user: { updateAvatar: async () => {
+    calls++;
+    return { status: 400, error: "provider response with secret-token" };
+  } } };
+  await assert.rejects(executeMedia(client, "updateAvatar", {}, Buffer.from("image")), error => {
+    assert.equal(error.statusCode, 400);
+    assert.match(error.message, /ảnh đại diện/);
+    assert.doesNotMatch(error.message, /secret-token|provider response/);
+    return true;
+  });
+  assert.equal(calls, 1);
+});
+
+test("successful avatar updates preserve the SDK result", async () => {
+  const result = { status: 200, profile_picture_url: "https://example.com/avatar.webp" };
+  const client = { user: { updateAvatar: async () => result } };
+  assert.equal(await executeMedia(client, "updateAvatar", {}, Buffer.from("image")), result);
+});
+
 test("isolated worker extracts and compresses real video, cleaning success and encoder failure", async (t) => {
   const directory = await mkdtemp(join(tmpdir(), "lock-gold-test-"));
   const resource = await createSdkSession();

@@ -5,8 +5,10 @@ import { existsSync } from "node:fs";
 import { createApp } from "./app.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const app = createApp();
 const dev = process.argv.includes("--dev");
+if (process.env.NODE_ENV === "production" && dev)
+  throw new Error("Production must run prebuilt assets; --dev is not allowed.");
+const app = createApp();
 let vite;
 if (dev) {
   const { createServer } = await import("vite");
@@ -27,9 +29,10 @@ if (dev) {
   );
 }
 const port = Number(process.env.PORT || 4317);
-const server = app.listen(port, "127.0.0.1", () =>
+const host = process.env.HOST || "127.0.0.1";
+const server = app.listen(port, host, () =>
   console.log(
-    `Lock Gold Free: http://127.0.0.1:${port}${dev ? " (dev)" : " (prebuilt)"}`,
+    `Lock Gold Free: http://${host}:${port}${dev ? " (dev)" : " (prebuilt)"}`,
   ),
 );
 const stop = async () => {

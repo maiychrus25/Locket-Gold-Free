@@ -32,7 +32,15 @@ export async function executeMedia(
     return client.moments.uploadVideo(video, values);
   if (operation === "uploadImage") return client.moments.uploadImage(image);
   if (operation === "uploadAvatar") return client.user.uploadAvatar(image);
-  if (operation === "updateAvatar") return client.user.updateAvatar(image);
+  if (operation === "updateAvatar") {
+    const result = await client.user.updateAvatar(image);
+    if (Number.isInteger(result?.status) && result.status >= 400) {
+      const error = new Error("Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+      error.statusCode = result.status;
+      throw error;
+    }
+    return result;
+  }
   throw new Error("Unsupported media operation");
 }
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — hardened VPS release
+
+- Patched the SDK's shared image dependency to sharp 0.35.5 and normalized rejected avatar updates into safe API errors without retrying writes.
+- Added exact HTTPS production-origin validation, scoped proxy trust, production CSP and refusal of the Vite development server in production.
+- Added a pinned Linux runtime image and isolated VPS/HTTPS configuration; preserved existing consumer features and backend contracts apart from corrected avatar failure reporting.
+
 ## Unreleased — server readiness assessment
 
 - Recorded current production dependency advisories, a reproduced shared login throttle behind a reverse proxy, and an avatar-update false-success response before source publication.

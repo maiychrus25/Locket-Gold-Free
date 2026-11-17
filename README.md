@@ -50,6 +50,8 @@ npm start
 
 ## Server readiness · 2026-11-17
 
+The following findings describe the initial review. They are corrected by the [hardened release](SYSTEM_DOCUMENTATION.md#hardened-vps-release--2026-11-17), whose origin is deployed at reelsup.store; public edge verification currently awaits Cloudflare Full (strict). See [release verification](docs/verification/server-release.md).
+
 Source publication is authorized; **public deployment readiness has not been established**. Passing local API/browser fixtures does not establish live Locket reliability.
 
 - `npm audit --omit=dev` reports two high-severity package entries: the pinned SDK and its `sharp@0.33.5` dependency. This is one affected dependency chain, not two independently demonstrated exploits. See the [server assessment](SYSTEM_DOCUMENTATION.md#server-readiness-assessment--2026-11-17) for advisory links and limits. A compatible patched image stack must be tested before accepting public uploads.
@@ -58,6 +60,12 @@ Source publication is authorized; **public deployment readiness has not been est
 - The current runtime is one loopback Node process with RAM sessions, at most 100 sessions and two media jobs. Restarting requires login again; replicas do not share sessions. Hosting needs HTTPS, the exact `APP_ORIGIN`, `NODE_ENV=production`, ffmpeg, suitable upload/time limits and SSE forwarding, followed by actual-server tests. Production must run a prebuilt artifact.
 
 No server deployment, production configuration change, dependency override or live account write is part of this publication assessment.
+
+## Prebuilt VPS release
+
+Build the Dockerfile in development and ship the saved Linux/amd64 image with `deploy/compose.yaml`, `deploy/nginx.conf` and `deploy/renew-certificate.sh`. The VPS loads the verified image and runs Compose with `--no-build --pull never`; no application checkout/install/build runs on production. `APP_ORIGIN` must be the exact HTTPS origin, and `TRUST_PROXY_IP` the single verified Docker bridge gateway. The host publishes only loopback; Nginx terminates TLS and restores client IPs only from trusted Cloudflare ranges. Cloudflare must use Full (strict).
+
+Current release configuration is `/opt/lock-gold-free/current`; it is a symlink to the immutable release directory. RAM sessions require login again after a container replacement. For future rollback, run the previous verified release's Compose configuration/image tag with the same project name and `--no-build --pull never`. This first release has no previous application image; stopping only its `web` service withdraws the app while preserving TLS and unrelated services. Keep artifact hashes, known-good images and configuration records for subsequent releases.
 
 ## Checks
 

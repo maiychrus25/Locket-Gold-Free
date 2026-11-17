@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
+import { request as httpRequest } from "node:http";
+import { spawnSync } from "node:child_process";
 import { createApp } from "../server/app.js";
 import { executeMedia } from "../server/services/locket/media-worker.js";
 
@@ -144,6 +146,59 @@ test("requires a session before any account operation", async (t) => {
   const { request } = await setup(t);
   const response = await request("/api/operations/user/getProfile", {});
   assert.equal(response.status, 401);
+});
+
+test("production refuses a missing, insecure or non-origin public URL", () => {
+  for (const allowedOrigin of [undefined, "http://example.com", "https://example.com/path", "https://user:password@example.com", "invalid"])
+    assert.throws(() => createApp({ production: true, allowedOrigin }), /APP_ORIGIN/);
+});
+
+test("production trusts only its explicitly configured bridge proxy and loopback", async t => {
+  const options = { production: true, allowedOrigin: "https://lock-gold.example" };
+  for (const proxyAddress of ["true", "0.0.0.0/0", "172.16.0.0/12", "example.com"])
+    assert.throws(() => createApp({ ...options, proxyAddress }), /TRUST_PROXY_IP/);
+  const app = createApp({ ...options, proxyAddress: "172.30.231.1" });
+  t.after(() => app.locals.shutdown());
+  const trusted = app.get("trust proxy fn");
+  assert.equal(trusted("172.30.231.1"), true);
+  assert.equal(trusted("127.0.0.1"), true);
+  assert.equal(trusted("172.30.231.2"), false);
+  assert.equal(trusted("203.0.113.1"), false);
+});
+
+test("production entry point refuses the development server", () => {
+  const result = spawnSync(process.execPath, ["server/index.js", "--dev"], {
+    env: { ...process.env, NODE_ENV: "production", APP_ORIGIN: "https://lock-gold.example", PORT: "0" },
+    encoding: "utf8", timeout: 10000,
+  });
+  assert.ifError(result.error);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /prebuilt assets; --dev is not allowed/);
+});
+
+test("production proxy keeps client throttles separate and ignores a spoofed leftmost IP", async t => {
+  const { url } = await setup(t, { production: true, allowedOrigin: "https://lock-gold.example" });
+  const loginFrom = (forwarded, password = "bad-password") => new Promise((resolve, reject) => {
+    const req = httpRequest(`${url}/api/auth/login`, { method: "POST", headers: {
+      Host: "lock-gold.example", Origin: "https://lock-gold.example", "X-Lock-Client": "web",
+      "X-Forwarded-For": forwarded, "Content-Type": "application/json",
+    } }, res => { res.resume(); res.on("end", () => resolve(res)); });
+    req.on("error", reject);
+    req.end(JSON.stringify({ email: "fixture@example.com", password }));
+  });
+  for (let count = 0; count < 5; count++) assert.equal((await loginFrom("192.0.2.10")).statusCode, 401);
+  assert.equal((await loginFrom("192.0.2.20")).statusCode, 401);
+  assert.equal((await loginFrom("198.51.100.1, 192.0.2.10")).statusCode, 429);
+  const response = await loginFrom("192.0.2.30");
+  assert.equal(response.statusCode, 401);
+  assert.match(response.headers["content-security-policy"], /script-src 'self'/);
+  assert.match(response.headers["content-security-policy"], /frame-ancestors 'none'/);
+  const success = await loginFrom("192.0.2.40", "correct-password");
+  assert.equal(success.statusCode, 200);
+  const cookie = success.headers["set-cookie"][0];
+  assert.match(cookie, /; Secure/);
+  assert.match(cookie, /; HttpOnly/);
+  assert.match(cookie, /; SameSite=Strict/);
 });
 
 test("catalog is public and never includes invocation code or credentials", async (t) => {

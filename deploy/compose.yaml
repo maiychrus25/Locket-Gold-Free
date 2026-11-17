@@ -1,0 +1,39 @@
+services:
+  web:
+    image: lock-gold-free:${RELEASE_TAG:?Set the verified local image tag}
+    container_name: lock-gold-free
+    init: true
+    restart: unless-stopped
+    environment:
+      APP_ORIGIN: https://reelsup.store
+      TRUST_PROXY_IP: 172.30.231.1
+    ports:
+      - 127.0.0.1:4317:4317
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=536870912,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 1536m
+    cpus: 2
+    pids_limit: 128
+    stop_grace_period: 200s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    networks:
+      app:
+        ipv4_address: 172.30.231.2
+
+networks:
+  app:
+    name: lock-gold-free
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.231.0/29
+          gateway: 172.30.231.1
