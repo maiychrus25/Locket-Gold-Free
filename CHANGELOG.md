@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — server readiness assessment
+
+- Recorded current production dependency advisories, a reproduced shared login throttle behind a reverse proxy, and an avatar-update false-success response before source publication.
+- Documented the public-deployment blockers and single-process runtime limits; no runtime, dependency, endpoint or production configuration change.
+
 ## Unreleased — mobile visual refresh
 
 - Reworked colors, spacing and light/dark surfaces around cream, honey, peach, lilac and mint.

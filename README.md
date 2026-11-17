@@ -48,6 +48,17 @@ make build
 npm start
 ```
 
+## Server readiness · 2026-11-17
+
+Source publication is authorized; **public deployment readiness has not been established**. Passing local API/browser fixtures does not establish live Locket reliability.
+
+- `npm audit --omit=dev` reports two high-severity package entries: the pinned SDK and its `sharp@0.33.5` dependency. This is one affected dependency chain, not two independently demonstrated exploits. See the [server assessment](SYSTEM_DOCUMENTATION.md#server-readiness-assessment--2026-11-17) for advisory links and limits. A compatible patched image stack must be tested before accepting public uploads.
+- Express currently leaves `trust proxy` disabled. Behind a local reverse proxy, users share its peer IP for the login throttle; five failed logins can block a different user. The proxy trust boundary and forwarded-header handling need a verified configuration.
+- Avatar updates can incorrectly report success: this SDK returns a failed Firebase update as a result object, and the adapter currently forwards it with HTTP 200. The failure must be normalized before this flow can be considered reliable.
+- The current runtime is one loopback Node process with RAM sessions, at most 100 sessions and two media jobs. Restarting requires login again; replicas do not share sessions. Hosting needs HTTPS, the exact `APP_ORIGIN`, `NODE_ENV=production`, ffmpeg, suitable upload/time limits and SSE forwarding, followed by actual-server tests. Production must run a prebuilt artifact.
+
+No server deployment, production configuration change, dependency override or live account write is part of this publication assessment.
+
 ## Checks
 
 ```sh
