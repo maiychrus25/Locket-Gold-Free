@@ -1,6 +1,6 @@
 # Verification record
 
-Latest: [friend feed repair](verification/friend-feed.md). Earlier: [hardened server release](verification/server-release.md), [mobile design verification](verification/mobile-design.md), [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
+Latest: [Reels friend feed](verification/reels-feed.md). Earlier: [friend feed repair](verification/friend-feed.md), [hardened server release](verification/server-release.md), [mobile design verification](verification/mobile-design.md), [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
 
 Status: Verified in local development on 2026-11-16. No public deployment.
 

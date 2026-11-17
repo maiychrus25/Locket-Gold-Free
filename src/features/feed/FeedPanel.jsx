@@ -8,6 +8,7 @@ import { Feedback } from "../../components/Feedback.jsx";
 import { momentDate, localDate, momentAuthor, feedPage } from "../../lib/memories.js";
 import { ViewsDialog } from "./ViewsDialog.jsx";
 import { FriendSelect, friendName } from "./FriendSelect.jsx";
+import { ReelsFeed } from "./ReelsFeed.jsx";
 
 export function FeedPanel({ tab, confirmAction, userUid }) {
   const state = useOperation();
@@ -16,7 +17,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [comment, setComment] = useState({});
   const [cursor, setCursor] = useState("");
   const [filter, setFilter] = useState("");
-  const [layout, setLayout] = useState("grid");
+  const [layout, setLayout] = useState(tab === "history" ? "grid" : "reels");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
   const [reactions, setReactions] = useState({});
@@ -24,6 +25,9 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [profiles, setProfiles] = useState(() => new Map());
   const [profilesLoaded, setProfilesLoaded] = useState(false);
   const [loadingPage, setLoadingPage] = useState(true);
+  const [fromHistory, setFromHistory] = useState(false);
+  const [historyUnavailable, setHistoryUnavailable] = useState(false);
+  const [viewerRevision, setViewerRevision] = useState(0);
   const pageBusy = useRef(true);
   const filterRevision = useRef(0);
   async function load(next = false) {
@@ -49,10 +53,13 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                 }
               : {}),
           }
-        : next && cursor ? { pageToken: cursor } : {},
+        : { includeHistory: true, ...(next && cursor ? { pageToken: cursor } : {}) },
     );
     if (result && revision === filterRevision.current) {
-      const page = tab === "history" ? null : feedPage(next ? records(payload) : [], records(result.value), next ? cursor : "");
+      const page = tab === "history" ? null : feedPage(next ? records(payload) : [], records(result.value), next ? cursor : "", Array.isArray(result.value) ? undefined : result.value?.nextPageToken || null);
+      setFromHistory(tab === "history" || (!Array.isArray(result.value) && !result.value?.historyUnavailable));
+      setHistoryUnavailable(Boolean(result.value?.historyUnavailable));
+      if (!next) setViewerRevision(previous => previous + 1);
       setPayload(page ? page.moments : result.value);
       setLoaded(true);
       setCursor(
@@ -80,12 +87,14 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
             limit: 20,
             ...(userUid ? { filteredByUserId: userUid } : {}),
           }
-        : {},
+        : { includeHistory: true },
     )
       .then((response) => {
         if (!cancelled && revision === filterRevision.current) {
           const value = unwrap(response);
-          const page = tab === "history" ? null : feedPage([], records(value));
+          const page = tab === "history" ? null : feedPage([], records(value), "", Array.isArray(value) ? undefined : value?.nextPageToken || null);
+          setFromHistory(tab === "history" || (!Array.isArray(value) && !value?.historyUnavailable));
+          setHistoryUnavailable(Boolean(value?.historyUnavailable));
           setPayload(page ? page.moments : value);
           setLoaded(true);
           setCursor(
@@ -183,6 +192,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         </form>
       )}
       <div className="memory-controls" aria-label="Cách hiển thị">
+        {tab !== "history" && <button className="button secondary" aria-pressed={layout === "reels"} onClick={() => setLayout("reels")}>Lướt từng tin</button>}
         <button className="button secondary" aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>Dạng lưới</button>
         <button className="button secondary" aria-pressed={layout === "list"} onClick={() => setLayout("list")}>Dạng danh sách</button>
       </div>
@@ -193,6 +203,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         <p className="muted">Chỉ lọc các khoảnh khắc trên trang đã tải, không phải toàn bộ lịch sử. Ngày hiển thị theo múi giờ thiết bị.</p>
       </div>}
       <Feedback state={{ ...state, error: state.error ? "Chưa hoàn tất yêu cầu. Hãy kiểm tra lại trước khi thử lại." : "" }} />
+      {historyUnavailable && <p role="status" className="muted">Hiện chỉ tải được tin mới nhất. Các khoảnh khắc cũ chưa tải được; bạn bấm Tải lại để thử lại nhé.</p>}
       {!loaded && !state.error && (
         <p role="status" className="muted">
           Đang tải khoảnh khắc…
@@ -205,8 +216,21 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           <p>Khoảnh khắc được chia sẻ sẽ xuất hiện tại đây.</p>
         </div>
       )}
-      <div className={`daily-grid memory-layout memory-${layout}`}>
-        {items.map((item, index) => {
+      <div className={`memory-layout memory-${layout} ${layout === "reels" ? "" : "daily-grid"}`}>
+        {layout === "reels" && items.length ? <ReelsFeed key={viewerRevision} pageToken={cursor} busy={state.pending || loadingPage} loadMore={() => load(true)}>
+          {renderCards()}
+        </ReelsFeed> : renderCards()}
+      </div>
+      {cursor && layout !== "reels" && (
+        <button className="button secondary" disabled={state.pending || loadingPage} onClick={() => load(true)}>
+          {tab === "history" ? "Trang tiếp theo" : "Tải thêm khoảnh khắc"}
+        </button>
+      )}
+      {viewing && <ViewsDialog key={viewing} momentUid={viewing} close={() => setViewing(null)} />}
+    </div>
+  );
+  function renderCards() {
+    return items.map((item, index) => {
           const id = postId(item);
           const date = momentDate(item);
           const video = safeUrl(
@@ -220,7 +244,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           return (
             <article className="moment-card" key={id || index}>
               {video ? (
-                <video controls preload="metadata" src={video} poster={image} />
+                <video controls playsInline loop={layout === "reels"} muted={layout === "reels"} preload="metadata" src={video} poster={image} />
               ) : image ? (
                 <img
                   src={image}
@@ -244,7 +268,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                       action("react", {
                         momentUid: id,
                         reaction: "❤️",
-                        fromMemory: tab === "history",
+                        fromMemory: tab === "history" || fromHistory,
                       })
                     }
                   >
@@ -266,7 +290,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                   <select aria-label="Chọn cảm xúc" value={reactions[id] || "❤️"} onChange={event => setReactions(previous => ({ ...previous, [id]: event.target.value }))}>
                     {["❤️", "😂", "🥰", "🔥", "👏", "😮"].map(emoji => <option key={emoji} value={emoji}>{emoji}</option>)}
                   </select>
-                  <button className="button secondary" disabled={state.pending || !id} onClick={() => action("react", { momentUid: id, reaction: reactions[id] || "❤️", fromMemory: tab === "history" })}>Gửi cảm xúc</button>
+                  <button className="button secondary" disabled={state.pending || !id} onClick={() => action("react", { momentUid: id, reaction: reactions[id] || "❤️", fromMemory: tab === "history" || fromHistory })}>Gửi cảm xúc</button>
                   <button className="button secondary" disabled={!id} onClick={() => setViewing(id)}>Xem lượt xem</button>
                   {tab === "history" && authorUid && authorUid === userUid && (
                     <button
@@ -294,7 +318,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                         momentUid: id,
                         receiverUid: authorUid,
                         text: comment[id],
-                        fromMemory: tab === "history",
+                        fromMemory: tab === "history" || fromHistory,
                       });
                       if (result) {
                         setComment((previous) => ({
@@ -329,18 +353,6 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
               </div>
             </article>
           );
-        })}
-      </div>
-      {cursor && (
-        <button
-          className="button secondary"
-          disabled={state.pending || loadingPage}
-          onClick={() => load(true)}
-        >
-          {tab === "history" ? "Trang tiếp theo" : "Tải thêm khoảnh khắc"}
-        </button>
-      )}
-      {viewing && <ViewsDialog key={viewing} momentUid={viewing} close={() => setViewing(null)} />}
-    </div>
-  );
+        });
+  }
 }

@@ -9,6 +9,11 @@ test('feed continuation appends distinct moments and stops empty or repeated cur
   assert.deepEqual(memory.feedPage([first, second], [second], 'second'), {moments:[first, second], cursor:''});
   assert.deepEqual(memory.feedPage([first], [], 'first'), {moments:[first], cursor:''});
   assert.deepEqual(memory.feedPage([], [null, 'invalid', first]), {moments:[first], cursor:'first'});
+  assert.deepEqual(memory.feedPage([], [first], '', 'encoded-history-date'), {moments:[first], cursor:'encoded-history-date'});
+  assert.deepEqual(memory.feedPage([first], [second], 'encoded-history-date', null), {moments:[first, second], cursor:''});
+  assert.deepEqual(memory.feedPage([first], [first], 'encoded-history-date', 'next-history-document'), {moments:[first], cursor:'next-history-document'});
+  assert.deepEqual(memory.feedPage([first], [], 'encoded-history-date', 'next-history-document'), {moments:[first], cursor:''});
+  assert.deepEqual(memory.feedPage([first], [second], 'same', 'same'), {moments:[first, second], cursor:''});
 });
 test('feed author resolution never trusts an inferred history owner', () => {
   assert.equal(typeof memory.momentAuthor, 'function');

@@ -45,7 +45,9 @@ components:
 ## Overview
 A warm, personal photo workspace: honey-yellow actions, a cream/lilac canvas, peach and mint accents, generous cards and clear Vietnamese copy. Dark mode uses plum surfaces and the same semantic accents. The brand name is not a claim that Gold subscriptions are unlocked.
 
-Friend-feed repair: retain the current cards and visual tokens. Author names wrap within the card at 320px, use verified profile names or a clear unavailable label, and never expose UIDs. A 44px-or-larger load-more action appends older moments without removing visible cards; pending and error states preserve reading context. History remains page-based.
+Friend-feed repair: retain the visual tokens. Author names wrap within the card at 320px, use verified profile names or a clear unavailable label, and never expose UIDs. Pending and error states preserve reading context. History remains page-based.
+
+Reels feed: latest moments default to a vertical scroll-snap viewer, one moment per panel, capped at 760px on desktop and fitted to the available mobile viewport. Native touch scrolling, keyboard navigation, 44px previous/next buttons and a position label make every loaded moment reachable. Photos use contain sizing; the active visible video plays muted with native sound controls and pauses on exit. Keep metadata and actions on theme-aware surfaces, with a separately scrollable details area for long captions. Grid/list remain available. Continue loading older shared moments at the end, preserving existing posts on failure. Respect reduced motion; never force sound or automatically send a reaction/view write.
 
 ## Colors
 Use yellow for primary actions and selected navigation; green for live connection status. Every surface, input, toast, modal and empty state uses the same semantic light/dark variables.

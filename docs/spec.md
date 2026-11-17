@@ -2,11 +2,21 @@
 
 Status: Implemented and verified in local development; live Locket interoperability unverified
 
+## Reels friend feed · 2026-11-17
+
+Status: Verified in development and immutable Linux artifact; production deployment pending
+
+Browse shared moments vertically, one per panel, with real author names, touch/keyboard/previous-next navigation and active-video playback. Load older moments from the authenticated shared history using explicit continuation rather than assuming a canonical ID is a history cursor. Keep grid/list choices, existing comments/reactions/viewers, personal history filters and ownership restrictions, and all other account features. Preserve content on failure, show latest-only fallback explicitly, never guess authors and never render technical responses. Plan: [reels-feed.md](plans/reels-feed.md).
+
 ## Friend feed repair · 2026-11-17
 
 Status: Deployed and verified at https://reelsup.store; live account-specific feed remains unverified
 
 The operator reports missing author names and a single visible friend post. Resolve known author UIDs through real account friend/self profiles, expose continuation for latest moments without changing the legacy array response, and append/deduplicate the resulting cards. Preserve previous content on failure, stop repeated/end cursors, keep existing history filters/ownership and every other working feature. Test stale account/profile replies and pending reads; verify desktop/mobile light/dark twice before replacing the authorized site's immutable artifact. No live account reads or writes are required for fixture verification; real provider acceptance must not be inferred from it.
+
+### Ghi chú sau phát hành
+
+The operator still could not browse other moments after that release. Its fixture pagination checks did not establish live older-history access. The Reels follow-up replaces the consumer read path with explicit shared-history continuation and preserves the legacy API for existing callers; the earlier release's live limitation remains material.
 
 ## Objective and scope
 Build a Vietnamese website covering all account-facing features of `locket.js@0.0.3`. Reuse the published SDK, do not fork its protocol. Name: Lock Gold Free. No claim to activate a paid subscription. No automatic production deployment.

@@ -1,4 +1,5 @@
 import sdk from "locket.js";
+import { z } from "zod";
 import { operationMap, validateOperation } from "../../shared/operations.js";
 import { deviceSummary, getLatestPage } from "../services/locket/client.js";
 import { sendResult, fail } from "../session/context.js";
@@ -22,13 +23,15 @@ export function registerOperationsRoutes(app, { authenticated, limited, run }) {
       let values;
       try {
         values = validateOperation(operation, req.body);
+        if (operation.group === "moments" && operation.method === "getLatest" && !values.includeHistory && values.pageToken)
+          z.string().max(150).regex(/^[\w@.:-]+$/).parse(values.pageToken);
       } catch (error) {
         return fail(res, error, 400);
       }
       try {
         const data = await run(req.account, async (client) => {
           if (operation.group === "moments" && operation.method === "getLatest")
-            return getLatestPage(client, values.pageToken);
+            return getLatestPage(client, values.pageToken, values.includeHistory);
           if (operation.group === "client" && operation.method === "getDevice")
             return deviceSummary(client);
           if (
@@ -66,7 +69,7 @@ export function registerOperationsRoutes(app, { authenticated, limited, run }) {
         });
         sendResult(res, req.account, data);
       } catch (error) {
-        fail(res, error, 502, req.account);
+        fail(res, error, error instanceof z.ZodError ? 400 : 502, req.account);
       }
     },
   );

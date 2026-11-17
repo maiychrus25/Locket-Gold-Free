@@ -16,6 +16,20 @@ assumptions:
     verification: Not tested against live Locket.
     source: docs/spec.md; shared/operations.js
     updated_at: "2026-11-16"
+  - id: canonical-id-is-history-cursor
+    status: unknown
+    claim: Passing the last canonical_uid as getLatestMomentV2 sync_token retrieves older shared moments for a real account.
+    reason: The pinned SDK uses this loop, but its source is not a provider contract. The operator still reported a single accessible moment after the prior fixture-verified repair. Consumer browsing now uses the SDK history query with its explicit date/document cursor instead.
+    verification: Source inspected and local continuation fixtures exercised; no authenticated live provider read was performed. Prior passing fixtures do not establish older-history availability.
+    source: node_modules/locket.js/lib/modules/moments.js; docs/plans/reels-feed.md; tests/sdk.test.js
+    updated_at: "2026-11-17"
+  - id: history-preserves-real-author
+    status: contradicted
+    claim: The pinned SDK getMoments mapper preserves the original user field of unfiltered history entries.
+    reason: locket.js 0.0.3 discards fields.user and substitutes the account UID. The consumer adapter reuses the query/parser/cursor while preserving the original author and leaving missing authors unknown.
+    verification: Real installed SDK over controlled HTTP reproduced the wrong owner; adapter transport checks recovered actual authors and validated account-scoped continuation. This establishes local mapping behavior, not the completeness of live history.
+    source: tests/sdk.test.js; server/services/locket/client.js; node_modules/locket.js/lib/modules/moments.js
+    updated_at: "2026-11-17"
 fingerprints:
   - id: initial-development
     date: "2026-11-16"

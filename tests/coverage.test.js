@@ -41,8 +41,17 @@ test("optional pagination remains optional, recipients do not accidentally targe
   const latest = operationMap.get("moments/getLatest");
   assert.deepEqual(validateOperation(latest, {}), {});
   assert.deepEqual(validateOperation(latest, { pageToken: "moment-one" }), { pageToken: "moment-one" });
-  assert.throws(() => validateOperation(latest, { pageToken: "https://attacker.example" }));
-  assert.throws(() => validateOperation(latest, { pageToken: "x".repeat(151) }));
+  assert.deepEqual(validateOperation(latest, { includeHistory: false }), { includeHistory: false });
+  const historyCursor = Buffer.from(JSON.stringify({
+    date: "2026-11-17T10:00:00Z",
+    docName: "projects/locket-4252a/databases/locket/documents/history/fixture-self/entries/fixture-moment",
+  })).toString("base64url");
+  assert.ok(historyCursor.length > 150);
+  assert.deepEqual(validateOperation(latest, { includeHistory: true, pageToken: historyCursor }), {
+    includeHistory: true, pageToken: historyCursor,
+  });
+  assert.throws(() => validateOperation(latest, { includeHistory: "true" }));
+  assert.throws(() => validateOperation(latest, { includeHistory: true, pageToken: "x".repeat(4097) }));
   assert.deepEqual(
     validateOperation(operationMap.get("moments/getMoments"), {}),
     { limit: 20 },

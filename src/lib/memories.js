@@ -6,7 +6,7 @@ export function momentAuthor(item, history = false) {
     : item.sender || item.owner || { uid: item.user_uid || item.userUid });
 }
 
-export function feedPage(previous, incoming, currentCursor = "") {
+export function feedPage(previous, incoming, currentCursor = "", nextCursor) {
   const seen = new Set();
   const moments = [...previous, ...incoming].filter(item => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return false;
@@ -16,6 +16,7 @@ export function feedPage(previous, incoming, currentCursor = "") {
     return true;
   });
   const last = postId(incoming.at(-1));
+  if (nextCursor !== undefined) return { moments, cursor: typeof nextCursor === "string" && nextCursor.length <= 4096 && nextCursor !== currentCursor && incoming.length > 0 ? nextCursor : "" };
   const advancing = !currentCursor || (last !== currentCursor && moments.length > previous.length);
   const cursor = advancing && typeof last === "string" && /^[\w@.:-]{1,150}$/.test(last) ? last : "";
   return { moments, cursor };

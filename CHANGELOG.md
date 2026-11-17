@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Reels friend feed
+
+- Browse friends' moments vertically with native snapping, touch/keyboard navigation, previous/next controls and active-video playback.
+- Read older shared history with an explicit date/document cursor and preserve real authors discarded by the pinned SDK; keep the legacy latest-array API.
+- Preserve existing posts on continuation failure and retain latest-only access with a clear retry message if initial history is unavailable. Keep grid/list, comments/reactions/viewers, history filters and account isolation; add no dependency.
+
 ## 2026-11-17 — friend feed repair
 
 - Resolve feed author UIDs through friend/self profiles while preserving unknown-history ownership restrictions.

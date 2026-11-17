@@ -5,6 +5,20 @@ Status: Development; live web Locket interoperability unverified
 
 <!-- docs-check: API coverage is verified against shared/operations.js -->
 
+## Reels friend feed · 2026-11-17
+
+Status: Development and built-artifact checks passed; production update pending; live account history remains unverified.
+
+<!-- docs-check: Reels uses explicit shared-history continuation; legacy getLatest remains compatible. -->
+
+The consumer feed calls `moments.getLatest` with optional `includeHistory: true`. This returns `{moments, nextPageToken}` from the same authenticated Firestore history/entries query used by the pinned SDK, without a user filter, 20 entries per page ordered by date and document name. The adapter reuses the SDK parser/cursor but preserves the actual `fields.user` author rather than substituting the current account. Unknown authors stay unknown. Cursors are bounded, validated timestamps/document references scoped to the signed-in account; provider failures remain errors, not empty pages. No arbitrary URL, account selector, token storage or new dependency is introduced.
+
+Calls omitting `includeHistory` retain the existing array result and validated canonical-ID continuation. The consumer uses the explicit history cursor instead of inferring older-page availability from a moment ID. Pages append with deduplication and stop on exhausted/repeated cursors or empty pages; a duplicate-only history page can continue when its document cursor advances. Failed continuation retains previous posts and the cursor. If the initial history read fails or has no entries, an explicit latest-only fallback preserves the previously available feed and tells the user to retry loading older moments. Failed later pages never silently substitute latest posts. Historical reactions/comments use `fromMemory: true`; a latest-only fallback uses false. Personal-history filters, replacement pagination and delete ownership are unchanged.
+
+The latest view defaults to a native vertical scroll-snap Reels viewer with previous/next and keyboard controls, a position indicator, touch/wheel continuation, and retained grid/list choices. Only the visible active video may play, muted initially, with native sound controls; leaving the viewer/tab pauses playback. No automatic reaction or mark-as-viewed write is sent. Details can scroll independently for long captions and narrow/short viewports. Empty, pending, exhausted and failure states use consumer copy without raw responses or identifiers.
+
+Source evidence: `locket.js@0.0.3` `lib/modules/moments.js`, especially `getLatest`, `getSharedMomentsByUser`, `getMoments` and its history author mapping; upstream [pinned source](https://github.com/hmkk69/locket.js/blob/54bb186063674a361a23af81ba15a107aead8114/lib/modules/moments.js#L970-L1071). A canonical-ID sync loop is not evidence that a real account can retrieve older moments. Tests prove adapter and UI behavior against controlled HTTP data; the number and availability of a real account's shared history remain subject to provider access and require account testing.
+
 ## Run locally
 
 Requirements: Node.js 24+, npm and ffmpeg (available on the development machine).

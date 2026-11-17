@@ -2,7 +2,7 @@
 
 Pinned dependency: `locket.js@0.0.3`. Every account-facing prototype method is checked by `tests/coverage.test.js`. All listed operations remain accessible through the validated backend. Consumer screens expose named daily actions and media utilities; raw protocol forms, identifiers and JSON responses are intentionally absent from the UI at the operator's request.
 
-`moments.getLatest` additionally accepts optional validated `pageToken` for continuation; an omitted token preserves the SDK's first call and the existing array response. The adapter reuses the SDK's fixed sync-token feed pattern; no new public operation or arbitrary request proxy is added.
+`moments.getLatest` additionally accepts optional validated `pageToken` for continuation. Omitting `includeHistory` preserves the legacy SDK call/array response and canonical-ID token validation. The consumer passes `includeHistory: true` to read 20 shared-history entries and receive `{moments, nextPageToken}` with a date/document cursor scoped to the signed-in account. The adapter retains actual authors discarded by the SDK mapper. First-page history failure or an empty initial history may return `{moments, nextPageToken: null, historyUnavailable: true}` from the legacy latest read; the UI explicitly explains this fallback. Later-page errors preserve visible content and the cursor. No new operation or arbitrary request proxy is added.
 
 | SDK operation | Website action | Transport |
 | --- | --- | --- |
