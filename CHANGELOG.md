@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — mobile visual refresh
+
+- Reworked colors, spacing and light/dark surfaces around cream, honey, peach, lilac and mint.
+- Added compact phone header, six short navigation labels with full accessible names, larger touch targets and safe-area spacing.
+- Made the home hero shorter and organized the existing creator into three visual steps; all 158 caption presets remain available through a native disclosure and dropdown.
+- Reused existing components, drafts, account operations and dependencies; no server or payment changes.
+
 ## Unreleased — free experience refresh
 
 - Researched official Locket/Gold features and documented implemented, provider-controlled and native-only capabilities.

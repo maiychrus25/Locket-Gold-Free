@@ -99,6 +99,12 @@ The operator subsequently required a consumer-only presentation. Raw JSON render
 
 Preset selection no longer copies SDK styling into request override fields. Of 158 current presets, 79 have eight-digit RGBA text colors, which are valid defaults in the SDK but incompatible with the unchanged six-digit custom-color validator. Selecting a chip or dropdown value clears custom overrides and sends the preset identifier; preview accepts preset alpha colors. Custom colors use a native color picker. Every catalog preset is tested with the real parser and server validator; invalid legacy overrides remain subject to validation rather than weakening the boundary.
 
+### Mobile visual refresh · 2026-11-17
+
+The visual identity now uses a cream/lilac canvas, honey actions, peach/mint accents and plum dark surfaces. Existing light/dark and three accent preferences retain their keys and behavior. The desktop sidebar remains at six destinations; phones show their short labels in a floating dock with full accessible names, targets at least 44px and bottom safe-area spacing. A sticky compact header retains account, free-guide and theme actions. The home hero is compact on phones; decorative code-rendered artwork is hidden at narrow widths and never represents account content.
+
+The existing creator form has three visual steps, not a new multistep state machine: media, caption/style, then privacy/recipients. The first eight caption presets appear directly and a native disclosure exposes the complete remaining library. Both chips and the existing dropdown retain the same parser, validation and draft ownership. Form controls use at least 16px text, native color swatches remain usable, and dialogs scroll within the viewport. No dependency, endpoint, upload limit, SDK behavior or account permission changes were introduced. Checks and physical-device/live-provider limits are recorded in [mobile-design.md](docs/verification/mobile-design.md).
+
 ### Earlier source-publication observations
 
 - Primary dependency: https://github.com/hmkk69/locket.js (MIT), npm version 0.0.3.

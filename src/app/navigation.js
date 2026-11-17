@@ -11,31 +11,37 @@ export const navigation = [
   {
     id: "home",
     label: "Tổng quan",
+    shortLabel: "Tổng quan",
     icon: LayoutGrid,
   },
   {
     id: "compose",
     label: "Tạo khoảnh khắc",
+    shortLabel: "Tạo",
     icon: ImagePlus,
   },
   {
     id: "friends",
     label: "Bạn bè",
+    shortLabel: "Bạn bè",
     icon: Users,
   },
   {
     id: "chat",
     label: "Tin nhắn",
+    shortLabel: "Tin nhắn",
     icon: MessageCircle,
   },
   {
     id: "profile",
     label: "Hồ sơ của tôi",
+    shortLabel: "Hồ sơ",
     icon: UserRound,
   },
   {
     id: "tools",
     label: "Tiện ích",
+    shortLabel: "Tiện ích",
     icon: SlidersHorizontal,
   },
 ];

@@ -37,11 +37,19 @@ export function CaptionPresets({ presets, values, onChange, disabled }) {
     <h4>Chọn một sắc thái</h4>
     <p className="muted">Xem ngay trên ảnh. Chú thích được gửi riêng, không sửa tệp gốc.</p>
     <div className="creator-presets" aria-label="Kiểu chú thích">
-      {presets.map((preset) => <button type="button" className="preset-button" key={preset.value}
+      {presets.slice(0, 8).map((preset) => <button type="button" className="preset-button" key={preset.value}
         disabled={disabled} aria-pressed={(values.noteType || "standard") === preset.value}
         onClick={() => onChange(presetValues(values, preset.value))}>
         {preset.icon && <span aria-hidden="true">{preset.icon} </span>}{presetLabel(preset)}
       </button>)}
+      {presets.length > 8 && <details className="preset-library">
+        <summary>Tất cả mẫu chú thích <span>{presets.length} kiểu</span></summary>
+        <div className="preset-library-grid">{presets.slice(8).map(preset => <button type="button" className="preset-button" key={preset.value}
+          disabled={disabled} aria-pressed={values.noteType === preset.value}
+          onClick={() => onChange(presetValues(values, preset.value))}>
+          {preset.icon && <span aria-hidden="true">{preset.icon} </span>}{presetLabel(preset)}
+        </button>)}</div>
+      </details>}
     </div>
   </div>;
 }

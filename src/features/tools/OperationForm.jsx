@@ -103,6 +103,7 @@ export function OperationForm({
           <p className="muted">{operation.description}</p>
         )}
         <div className="fields">
+          {operation.media === "post" && <div className="composer-step wide"><span>1</span><h4>Chọn khoảnh khắc</h4><small>Ảnh hoặc video</small></div>}
           {operation.media && (
             <MediaInput
               operation={operation}
@@ -119,7 +120,7 @@ export function OperationForm({
               disabled={pending}
             />
           )}
-          {operation.media === "post" && <CaptionPresets presets={catalog.presets} values={values} disabled={pending} onChange={(next) => updateDraft({ files, values: next })} />}
+          {operation.media === "post" && <><div className="composer-step wide"><span>2</span><h4>Thêm dấu ấn của bạn</h4><small>Lời nhắn & sắc màu</small></div><CaptionPresets presets={catalog.presets} values={values} disabled={pending} onChange={(next) => updateDraft({ files, values: next })} /></>}
           {(operation.fields || []).map((original) => {
             const field =
               original.name === "noteType"
@@ -133,6 +134,8 @@ export function OperationForm({
                   }
                 : original;
             return (
+              <React.Fragment key={field.name}>
+              {operation.media === "post" && field.name === "isPrivate" && <div className="composer-step wide"><span>3</span><h4>Gửi đến người bạn thương</h4><small>Bạn quyết định chia sẻ với ai</small></div>}
               <Field
                 key={field.name}
                 field={field}
@@ -148,6 +151,7 @@ export function OperationForm({
                   })
                 }
               />
+              </React.Fragment>
             );
           })}
         </div>

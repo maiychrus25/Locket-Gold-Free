@@ -6,7 +6,7 @@ export function PageHeading({ page, setPage }) {
   return (
     <div className="page-heading">
       <div className="eyebrow">
-        <span className="tiny-dot" /> YOUR LITTLE MOMENTS, TOGETHER
+        <span className="tiny-dot" /> GÓC NHỎ, KẾT NỐI THẬT
       </div>
       <div className="heading-row">
         <div>

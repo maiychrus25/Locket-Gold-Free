@@ -5,18 +5,18 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #24251e;
-  background: #f7f8f2;
+  color: #292538;
+  background: #f8f7fc;
   font-synthesis: none;
-  --bg: #f7f8f2;
+  --bg: #f8f7fc;
   --surface: #fff;
-  --soft: #f3f4ed;
-  --ink: #24251e;
-  --muted: #65675d;
-  --border: #e4e6db;
-  --yellow: #f4c542;
-  --olive: #717c45;
+  --soft: #f3f0f8;
+  --ink: #292538;
+  --muted: #716b81;
+  --border: #e9e5f0;
+  --yellow: #ffcc66;
+  --olive: #7967ad;
   --error: #ab3535;
-  --hero: #f8edb9;
-  --shadow: 0 6px 25px #29301904;
+  --hero: #fff0df;
+  --shadow: 0 8px 28px #30264a07;
 }

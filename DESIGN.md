@@ -1,15 +1,19 @@
 ---
 name: Lock Gold Free
 colors:
-  primary: "#f4c542"
-  ink: "#24251e"
-  muted: "#65675d"
-  background: "#f7f8f2"
+  primary: "#ffcc66"
+  ink: "#292538"
+  muted: "#716b81"
+  background: "#f8f7fc"
   surface: "#ffffff"
-  border: "#e4e6db"
-  darkBackground: "#141711"
-  darkSurface: "#1e221a"
-  darkText: "#eff1e8"
+  border: "#e9e5f0"
+  peach: "#fff0e6"
+  lilac: "#f0ebff"
+  mint: "#e4f5ee"
+  focus: "#8562c7"
+  darkBackground: "#161420"
+  darkSurface: "#211e2e"
+  darkText: "#f6f2fc"
   success: "#36724b"
 typography:
   heading:
@@ -39,16 +43,16 @@ components:
 ---
 
 ## Overview
-A warm, personal photo workspace: butter-yellow actions, olive-neutral canvas, generous cards, clear Vietnamese copy. The brand name is not a claim that Gold subscriptions are unlocked.
+A warm, personal photo workspace: honey-yellow actions, a cream/lilac canvas, peach and mint accents, generous cards and clear Vietnamese copy. Dark mode uses plum surfaces and the same semantic accents. The brand name is not a claim that Gold subscriptions are unlocked.
 
 ## Colors
 Use yellow for primary actions and selected navigation; green for live connection status. Every surface, input, toast, modal and empty state uses the same semantic light/dark variables.
 
 ## Typography
-System sans-serif avoids external font requests. Large page titles, concise labels, tabular counts; wrap usernames and API output rather than clipping meaning.
+System sans-serif avoids external font requests. Large page titles, concise labels, tabular counts; wrap names and messages rather than clipping meaning. Form controls stay at least 16px to avoid phone zoom.
 
 ## Layout
-Desktop: 232px sidebar, flexible main, optional 300px context panel. Below 1000px collapse the context panel; below 760px switch to compact header and bottom navigation. Minimum supported width 320px. Grids use minmax(0, 1fr); long strings wrap. No viewport-only fixed heights for forms.
+Desktop: 224px sidebar, flexible main, optional 260px context panel. Below 1000px collapse the context panel; below 760px switch to a compact sticky header and floating bottom navigation. Minimum supported width 320px. Grids use minmax(0, 1fr); long strings wrap. No viewport-only fixed heights for forms.
 
 ## Elevation & Depth
 Quiet borders and restrained 0 8px 32px rgba(20,25,10,.04) shadows. Dialog overlay has a blur and independent vertical scrolling.
@@ -70,3 +74,10 @@ Use semantic tokens for all themes. Web-only camera skins use cream, rose and oc
 All implemented tools are free, with no payment, subscription check, advertisement or local 20-friend gate. A capability guide distinguishes available web tools, provider-enforced limits and features absent from the SDK. Native widget/icon changes, subscription badges, streak restoration and music-provider linking must never be represented as completed web operations. Use concise contextual limits rather than repeated disclaimers in every form.
 
 Consumer presentation direction: show only the website's available free features and useful actions. Keep protocol limits, unsupported native features and source research in documentation. Never render response JSON, endpoint/method names, raw IDs or device internals. Choose friends by real names and moments by captions/previews. Use native color pickers, familiar quality choices, and human recovery messages; internal data contracts remain unchanged.
+
+## Mobile design refresh · 2026-11-17
+The current visual identity supersedes the earlier olive-neutral palette: cool cream canvas, honey yellow actions, peach/coral, lilac and mint supporting surfaces. Ink is a deep plum for clear contrast. Dark mode uses plum/charcoal surfaces, readable pale text and the same warm action color. Rose and ocean preferences remain available and map to the same semantic variables. Use gradients only in the decorative hero illustration; account photos are always real.
+
+Mobile comes first: sticky compact top bar, a floating bottom navigation dock with six equally accessible 44px targets, short visible labels and unchanged full accessible names. Make posting visually prominent. Keep the home hero below 270px on narrow phones so the feed is easy to reach. Desktop uses a quiet 224px sidebar, 32px gutters and a flexible main column. Cards are 22–28px rounded; body text 15px, secondary 12–13px, inputs 16px to avoid mobile zoom. Minimum layout width is 320px; controls wrap instead of causing page overflow. Main content clears the bottom dock and safe-area inset.
+
+Creation has three visual steps without changing submission: media, message/style, recipients. Show the first eight preset choices immediately and put the remaining choices in an accessible disclosure, preserving every preset and draft. Inputs, private mode, covers, compression and success/error behavior remain intact. All modal dialogs scroll within the viewport. Respect reduced motion and visible focus, and verify primary tasks in light/dark desktop/mobile twice before building the running artifact.

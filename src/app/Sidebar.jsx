@@ -17,20 +17,22 @@ export function Sidebar({ setPage, page, setTheme, theme }) {
           <Heart fill="currentColor" size={23} />
         </span>
         <span>
-          lock gold<span className="brand-tag">FREE · YOUR LITTLE MOMENTS</span>
+          lock gold<span className="brand-tag">GẦN NHAU HƠN, MỖI NGÀY</span>
         </span>
       </a>
       <div className="sidebar-label">KHÔNG GIAN CỦA BẠN</div>
       <nav aria-label="Điều hướng chính">
-        {navigation.map(({ id, label, icon: _Icon }) => (
+        {navigation.map(({ id, label, shortLabel, icon: _Icon }) => (
           <button
             key={id}
-            className={`nav-item ${page === id ? "active" : ""}`}
+            className={`nav-item nav-${id} ${page === id ? "active" : ""}`}
+            aria-label={label}
             aria-current={page === id ? "page" : undefined}
             onClick={() => setPage(id)}
           >
             <_Icon size={20} />
-            <span>{label}</span>
+            <span className="nav-label-full" aria-hidden="true">{label}</span>
+            <span className="nav-label-short" aria-hidden="true">{shortLabel}</span>
             {id === "compose" && <Plus size={15} className="nav-plus" />}
           </button>
         ))}
@@ -54,7 +56,7 @@ export function Sidebar({ setPage, page, setTheme, theme }) {
         </button>
         <div className="sidebar-footer">
           <span className="tiny-dot" />
-          Made for your little moments
+          Chia sẻ miễn phí. Gần nhau mỗi ngày.
         </div>
       </div>
     </aside>

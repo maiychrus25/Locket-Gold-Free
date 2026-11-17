@@ -35,21 +35,19 @@ export function HomePage({
 }) {
   return (
     <>
-      <div className="journal-meta"><span>{new Intl.DateTimeFormat("vi-VN", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</span><span><span className="tiny-dot" /> A LITTLE CLOSER, EVERY DAY</span></div>
+      <div className="journal-meta"><span>{new Intl.DateTimeFormat("vi-VN", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</span><span><Heart size={13} /> Những điều nhỏ, giữ thật lâu.</span></div>
       <section className={`welcome-card ${authenticated ? "connected-welcome" : ""}`}>
         <div className="welcome-copy">
           <span className="pill">
-            <Sparkles size={14} /> KHOẢNH KHẮC NHỎ. KẾT NỐI THẬT.
+            <Sparkles size={14} /> MỖI NGÀY MỘT CHÚT GẦN HƠN
           </span>
           <h2>
-            Khoảnh khắc của bạn.
+            Chia sẻ một chút.
             <br />
-            Gần nhau hơn một chút.
+            Gần nhau hơn.
           </h2>
           <p>
-            Đăng ảnh, gửi lời thương và kết nối với bạn bè.
-            <br className="desktop-break" />
-            Tất cả miễn phí, trong một góc nhỏ dành riêng cho bạn.
+            Ảnh, video và những điều bạn thương.
           </p>
           <button
             className="button dark"
@@ -61,52 +59,35 @@ export function HomePage({
             <ArrowUpRight size={17} />
           </button>
           <span className="welcome-foot">
-            <ShieldCheck size={14} /> Không quảng cáo · Không paywall
+            <ShieldCheck size={14} /> Miễn phí, từ những điều nhỏ nhất
           </span>
         </div>
         <div className="hero-art" aria-hidden="true">
-          <span className="art-spark one">✳</span>
-          <div className="photo-card back">
-            <div className="photo-sky">
-              <div className="sun-disc" />
-              <div className="hill hill-one" />
-              <div className="hill hill-two" />
-            </div>
-            <span>một ngày thật xinh ☀</span>
-          </div>
-          <div className="photo-card front">
-            <div className="flower-scene">
-              <div className="flower-stem" />
-              <span className="flower">✿</span>
-              <span className="small-flower">✿</span>
-              <span className="flower-label">little joys</span>
-            </div>
-            <span>gửi bạn một chút nắng</span>
-          </div>
-          <span className="floating-heart">
-            <Heart fill="currentColor" size={24} />
-          </span>
-          <span className="art-spark two">✧</span>
+          <span className="memory-orbit" />
+          <div className="memory-print print-back"><div className="memory-landscape"><span className="memory-sun" /><span className="memory-hill" /></div><span>một chút bình yên ☀</span></div>
+          <div className="memory-print print-front"><div className="memory-flower"><span>✿</span><i /></div><span>gửi bạn chút yêu thương</span></div>
+          <span className="memory-sticker"><Heart fill="currentColor" size={22} /></span>
+          <Sparkles className="memory-spark" size={28} />
         </div>
       </section>
       <div className="stats-row">
         {[
           {
             icon: Camera,
-            label: "Khoảnh khắc",
-            text: "Ảnh, video & chú thích",
+            label: "Đăng khoảnh khắc",
+            text: "Kể một chút hôm nay",
             action: "compose",
           },
           {
             icon: Users,
-            label: "Vòng tròn bạn bè",
-            text: "Những người thật gần",
+            label: "Vòng tròn nhỏ",
+            text: "Những người bạn thương",
             action: "friends",
           },
           {
             icon: MessageCircle,
             label: "Trò chuyện",
-            text: "Kể nhau nghe mỗi ngày",
+            text: "Một lời nhắn, thật gần",
             action: "chat",
           },
         ].map(({ icon: _Icon, label, text, action }) => (
@@ -126,7 +107,7 @@ export function HomePage({
           </button>
         ))}
       </div>
-      <div className="quick-create-strip" aria-label="Lối tắt khoảnh khắc"><span>Lưu lại hôm nay</span><button onClick={() => setPage("compose")}><Camera size={17} />Ảnh từ thư viện</button><button onClick={() => setPage("compose")}><Video size={17} />Video & ảnh bìa</button><button onClick={() => setFeedTab("history")}><CalendarHeart size={17} />Kỷ niệm</button><button onClick={() => setPage("guide")}><Crown size={17} />Tất cả tính năng</button></div>
+      <div className="quick-create-strip" aria-label="Lối tắt khoảnh khắc"><span>Không gian của bạn</span><button onClick={() => setFeedTab("history")}><CalendarHeart size={16} />Kỷ niệm</button><button onClick={() => setPage("guide")}><Crown size={16} />Khám phá tính năng</button></div>
       <div className="home-columns">
         <section className="panel feed-panel">
           <div className="section-heading">
@@ -186,7 +167,7 @@ export function HomePage({
           )}
         </section>
         <aside className="home-aside">
-          <section className="gold-free-card"><span className="gold-card-symbol"><Crown size={25} /></span><span className="section-kicker">GOLD IN SPIRIT. FREE TO USE.</span><h3>Nhiều cách hơn<br />để gần nhau.</h3><p>Đăng từ thư viện, video, nhãn chú thích và lượt xem. Mọi công cụ trên web đều miễn phí.</p><div className="gold-card-icons" aria-hidden="true"><Camera size={18} /><Video size={18} /><Eye size={18} /><Heart size={18} /></div><button className="button primary" onClick={() => setPage("guide")}>Khám phá tính năng<ArrowUpRight size={16} /></button></section>
+          <section className="gold-free-card"><span className="gold-card-symbol"><Crown size={25} /></span><span className="section-kicker">MỌI ĐIỀU BẠN CẦN. MIỄN PHÍ.</span><h3>Tự do chia sẻ.<br />Theo cách của bạn.</h3><p>Ảnh, video, chú thích và lượt xem. Một nơi cho những kết nối thật.</p><div className="gold-card-icons" aria-hidden="true"><Camera size={18} /><Video size={18} /><Eye size={18} /><Heart size={18} /></div><button className="button primary" onClick={() => setPage("guide")}>Khám phá tính năng<ArrowUpRight size={16} /></button></section>
           <section className="panel getting-started">
             <div className="section-heading">
               <h3>Một khởi đầu nhỏ</h3>
