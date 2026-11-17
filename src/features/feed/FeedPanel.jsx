@@ -5,7 +5,7 @@ import { request, records, safeUrl } from "../../lib/api.js";
 import { unwrap, postId, imageUrl, identity } from "../../lib/data.js";
 import { RefreshCw, Search, Heart, Eye, Trash2, Send } from "lucide-react";
 import { Feedback } from "../../components/Feedback.jsx";
-import { momentDate, localDate } from "../../lib/memories.js";
+import { momentDate, localDate, momentAuthor, feedPage } from "../../lib/memories.js";
 import { ViewsDialog } from "./ViewsDialog.jsx";
 import { FriendSelect, friendName } from "./FriendSelect.jsx";
 
@@ -21,8 +21,16 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [day, setDay] = useState("");
   const [reactions, setReactions] = useState({});
   const [viewing, setViewing] = useState(null);
+  const [profiles, setProfiles] = useState(() => new Map());
+  const [profilesLoaded, setProfilesLoaded] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const pageBusy = useRef(true);
   const filterRevision = useRef(0);
   async function load(next = false) {
+    if (pageBusy.current) return;
+    pageBusy.current = true;
+    setLoadingPage(true);
+    if (!next) setProfilesLoaded(false);
     const revision = ++filterRevision.current;
     const result = await state.run(
       "moments",
@@ -41,23 +49,30 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                 }
               : {}),
           }
-        : {},
+        : next && cursor ? { pageToken: cursor } : {},
     );
     if (result && revision === filterRevision.current) {
-      setPayload(result.value);
+      const page = tab === "history" ? null : feedPage(next ? records(payload) : [], records(result.value), next ? cursor : "");
+      setPayload(page ? page.moments : result.value);
       setLoaded(true);
       setCursor(
-        result.value?.nextPageToken ||
+        page ? page.cursor : result.value?.nextPageToken ||
           result.value?.next_page_token ||
           result.value?.pageToken ||
           "",
       );
+    }
+    if (revision === filterRevision.current) {
+      pageBusy.current = false;
+      setLoadingPage(false);
     }
   }
   const reportError = state.setError;
   useEffect(() => {
     let cancelled = false;
     const revision = ++filterRevision.current;
+    pageBusy.current = true;
+    setLoadingPage(true);
     request(
       `/api/operations/moments/${tab === "history" ? "getMoments" : "getLatest"}`,
       tab === "history"
@@ -70,10 +85,11 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
       .then((response) => {
         if (!cancelled && revision === filterRevision.current) {
           const value = unwrap(response);
-          setPayload(value);
+          const page = tab === "history" ? null : feedPage([], records(value));
+          setPayload(page ? page.moments : value);
           setLoaded(true);
           setCursor(
-            value?.nextPageToken ||
+            page ? page.cursor : value?.nextPageToken ||
               value?.next_page_token ||
               value?.pageToken ||
               "",
@@ -82,11 +98,41 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
       })
       .catch((error) => {
         if (!cancelled && revision === filterRevision.current) reportError(error.message);
+      })
+      .finally(() => {
+        if (!cancelled && revision === filterRevision.current) {
+          pageBusy.current = false;
+          setLoadingPage(false);
+        }
       });
     return () => {
       cancelled = true;
     };
   }, [tab, reportError, userUid]);
+  const needsProfiles = loaded && records(payload).some(item => {
+    const author = momentAuthor(item, tab === "history");
+    const uid = identity(author);
+    return uid && friendName(author) === "Bạn bè" && !profiles.has(uid);
+  });
+  useEffect(() => {
+    if (!needsProfiles || profilesLoaded) return;
+    let cancelled = false;
+    Promise.allSettled([
+      request("/api/operations/friends/getAllFriends", {}),
+      request("/api/operations/user/getProfile", {}),
+    ]).then(([friends, self]) => {
+      if (cancelled) return;
+      const people = friends.status === "fulfilled" ? records(friends.value).map(person => person.user || person) : [];
+      if (self.status === "fulfilled") {
+        const value = unwrap(self.value);
+        const person = value?.user || value;
+        if (person && typeof person === "object" && !Array.isArray(person)) people.push({ ...person, uid: userUid });
+      }
+      setProfiles(previous => new Map([...previous, ...people.filter(person => identity(person) && friendName(person) !== "Bạn bè").map(person => [identity(person), person])]));
+      setProfilesLoaded(true);
+    });
+    return () => { cancelled = true; };
+  }, [needsProfiles, profilesLoaded, userUid]);
   async function action(method, values) {
     const result = await state.run("moments", method, values);
     if (result) {
@@ -109,7 +155,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         </h3>
         <button
           className="button secondary"
-          disabled={state.pending}
+          disabled={state.pending || loadingPage}
           onClick={() => load()}
         >
           <RefreshCw size={15} />
@@ -124,13 +170,13 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
             load();
           }}
         >
-          <FriendSelect label="Khoảnh khắc của" emptyLabel="Của tôi" value={filter} disabled={state.pending}
+          <FriendSelect label="Khoảnh khắc của" emptyLabel="Của tôi" value={filter} disabled={state.pending || loadingPage}
             onChange={value => {
               filterRevision.current++;
               setFilter(value);
               setCursor("");
             }} />
-          <button className="button secondary" disabled={state.pending}>
+          <button className="button secondary" disabled={state.pending || loadingPage}>
             <Search size={16} />
             Lọc
           </button>
@@ -167,16 +213,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
             item.video_url || item.videoUrl || item.video?.url,
           );
           const image = imageUrl(item);
-          const author =
-            item.user ||
-            item.author ||
-            (tab !== "history"
-              ? item.sender ||
-                item.owner || { uid: item.user_uid || item.userUid }
-              : item.authorVerified === true
-                ? { uid: item.user_uid || item.userUid }
-                : null);
+          const author = momentAuthor(item, tab === "history");
           const authorUid = identity(author);
+          const person = friendName(author) !== "Bạn bè" ? author : profiles.get(authorUid);
+          const name = friendName(person);
           return (
             <article className="moment-card" key={id || index}>
               {video ? (
@@ -193,7 +233,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                 />
               ) : null}
               <div className="moment-body">
-                <h3>{friendName(author)}</h3>
+                <h3>{name !== "Bạn bè" ? name : authorUid && authorUid === userUid ? "Bạn" : "Chưa rõ người đăng"}</h3>
                 {date ? <time className="muted" dateTime={date.toISOString()}>{date.toLocaleString("vi-VN")}</time> : <small className="muted">Chưa rõ thời gian</small>}
                 {typeof item.caption === "string" && <p>{item.caption}</p>}
                 <div className="action-row">
@@ -294,10 +334,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
       {cursor && (
         <button
           className="button secondary"
-          disabled={state.pending}
+          disabled={state.pending || loadingPage}
           onClick={() => load(true)}
         >
-          Trang tiếp theo
+          {tab === "history" ? "Trang tiếp theo" : "Tải thêm khoảnh khắc"}
         </button>
       )}
       {viewing && <ViewsDialog key={viewing} momentUid={viewing} close={() => setViewing(null)} />}

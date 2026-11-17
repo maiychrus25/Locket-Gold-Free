@@ -1,6 +1,6 @@
 import sdk from "locket.js";
 import { operationMap, validateOperation } from "../../shared/operations.js";
-import { deviceSummary } from "../services/locket/client.js";
+import { deviceSummary, getLatestPage } from "../services/locket/client.js";
 import { sendResult, fail } from "../session/context.js";
 
 export function registerOperationsRoutes(app, { authenticated, limited, run }) {
@@ -27,6 +27,8 @@ export function registerOperationsRoutes(app, { authenticated, limited, run }) {
       }
       try {
         const data = await run(req.account, async (client) => {
+          if (operation.group === "moments" && operation.method === "getLatest")
+            return getLatestPage(client, values.pageToken);
           if (operation.group === "client" && operation.method === "getDevice")
             return deviceSummary(client);
           if (

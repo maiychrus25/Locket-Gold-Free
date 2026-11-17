@@ -2,6 +2,8 @@
 
 Pinned dependency: `locket.js@0.0.3`. Every account-facing prototype method is checked by `tests/coverage.test.js`. All listed operations remain accessible through the validated backend. Consumer screens expose named daily actions and media utilities; raw protocol forms, identifiers and JSON responses are intentionally absent from the UI at the operator's request.
 
+`moments.getLatest` additionally accepts optional validated `pageToken` for continuation; an omitted token preserves the SDK's first call and the existing array response. The adapter reuses the SDK's fixed sync-token feed pattern; no new public operation or arbitrary request proxy is added.
+
 | SDK operation | Website action | Transport |
 | --- | --- | --- |
 | `user.getProfile` | Xem hồ sơ theo UID | /api/operations/user/getProfile |

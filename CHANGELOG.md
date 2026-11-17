@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — friend feed repair
+
+- Resolve feed author UIDs through friend/self profiles while preserving unknown-history ownership restrictions.
+- Add backward-compatible latest-feed continuation and append/deduplicate older posts; preserve visible posts/cursors on errors and stop repeated pages.
+- Reuse existing SDK/session/UI patterns without adding dependencies or exposing technical identifiers.
+
 ## 2026-11-17 — hardened VPS release
 
 - Patched the SDK's shared image dependency to sharp 0.35.5 and normalized rejected avatar updates into safe API errors without retrying writes.

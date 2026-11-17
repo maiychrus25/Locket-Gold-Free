@@ -38,6 +38,11 @@ test("every account-facing SDK method has an allowlisted web flow", () => {
 });
 
 test("optional pagination remains optional, recipients do not accidentally target nobody", () => {
+  const latest = operationMap.get("moments/getLatest");
+  assert.deepEqual(validateOperation(latest, {}), {});
+  assert.deepEqual(validateOperation(latest, { pageToken: "moment-one" }), { pageToken: "moment-one" });
+  assert.throws(() => validateOperation(latest, { pageToken: "https://attacker.example" }));
+  assert.throws(() => validateOperation(latest, { pageToken: "x".repeat(151) }));
   assert.deepEqual(
     validateOperation(operationMap.get("moments/getMoments"), {}),
     { limit: 20 },

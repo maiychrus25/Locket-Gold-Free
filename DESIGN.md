@@ -45,6 +45,8 @@ components:
 ## Overview
 A warm, personal photo workspace: honey-yellow actions, a cream/lilac canvas, peach and mint accents, generous cards and clear Vietnamese copy. Dark mode uses plum surfaces and the same semantic accents. The brand name is not a claim that Gold subscriptions are unlocked.
 
+Friend-feed repair: retain the current cards and visual tokens. Author names wrap within the card at 320px, use verified profile names or a clear unavailable label, and never expose UIDs. A 44px-or-larger load-more action appends older moments without removing visible cards; pending and error states preserve reading context. History remains page-based.
+
 ## Colors
 Use yellow for primary actions and selected navigation; green for live connection status. Every surface, input, toast, modal and empty state uses the same semantic light/dark variables.
 

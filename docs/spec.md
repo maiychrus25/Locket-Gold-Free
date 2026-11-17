@@ -2,6 +2,12 @@
 
 Status: Implemented and verified in local development; live Locket interoperability unverified
 
+## Friend feed repair · 2026-11-17
+
+Status: Implemented in development; regression verification and release pending
+
+The operator reports missing author names and a single visible friend post. Resolve known author UIDs through real account friend/self profiles, expose continuation for latest moments without changing the legacy array response, and append/deduplicate the resulting cards. Preserve previous content on failure, stop repeated/end cursors, keep existing history filters/ownership and every other working feature. Test stale account/profile replies and pending reads; verify desktop/mobile light/dark twice before replacing the authorized site's immutable artifact. No live account reads or writes are required for fixture verification; real provider acceptance must not be inferred from it.
+
 ## Objective and scope
 Build a Vietnamese website covering all account-facing features of `locket.js@0.0.3`. Reuse the published SDK, do not fork its protocol. Name: Lock Gold Free. No claim to activate a paid subscription. No automatic production deployment.
 

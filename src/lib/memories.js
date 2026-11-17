@@ -1,3 +1,26 @@
+import { postId } from "./data.js";
+
+export function momentAuthor(item, history = false) {
+  return item.user || item.author || (history
+    ? item.authorVerified === true ? { uid: item.user_uid || item.userUid } : null
+    : item.sender || item.owner || { uid: item.user_uid || item.userUid });
+}
+
+export function feedPage(previous, incoming, currentCursor = "") {
+  const seen = new Set();
+  const moments = [...previous, ...incoming].filter(item => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return false;
+    const id = postId(item);
+    if (id && seen.has(id)) return false;
+    if (id) seen.add(id);
+    return true;
+  });
+  const last = postId(incoming.at(-1));
+  const advancing = !currentCursor || (last !== currentCursor && moments.length > previous.length);
+  const cursor = advancing && typeof last === "string" && /^[\w@.:-]{1,150}$/.test(last) ? last : "";
+  return { moments, cursor };
+}
+
 export function parseTimestamp(value) {
   if (value && typeof value === 'object') {
     value = value.timestampValue ?? value.seconds ?? value._seconds;

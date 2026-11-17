@@ -27,4 +27,5 @@
 }
 .memory-layout .moment-card { border-radius: 20px; }
 .memory-layout .moment-body p { font-size: 14px; }
+.memory-layout .moment-body h3 { overflow-wrap: anywhere; }
 .memory-layout .action-row button { min-height: 44px; font-size: 14px; }

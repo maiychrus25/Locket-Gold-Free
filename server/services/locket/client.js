@@ -3,6 +3,22 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sdk from "locket.js";
 
+export async function getLatestPage(client, pageToken) {
+  if (!pageToken) return client.moments.getLatest();
+  const result = await client.postApi("getLatestMomentV2", {
+    should_count_missed_moments: true,
+    include_group_moments: true,
+    sync_token: pageToken,
+  });
+  if (result?.status === 304 && !Array.isArray(result.data)) return [];
+  if ((Number.isInteger(result?.status) && result.status >= 400) || !Array.isArray(result?.data)) {
+    const error = new Error("Chưa tải được khoảnh khắc tiếp theo. Vui lòng thử lại.");
+    if (Number.isInteger(result?.status) && result.status >= 400) error.statusCode = result.status;
+    throw error;
+  }
+  return result.data;
+}
+
 export function deviceSummary(client) {
   const device = client.device;
   return {

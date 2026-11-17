@@ -121,6 +121,18 @@ The ingress appends `Cache-Control: no-transform` while preserving upstream API 
 
 ## References and post-release notes
 
+### Friend feed repair · 2026-11-17
+
+Status: Implemented in development; full regression verification and release pending.
+
+The existing `moments.getLatest` operation now accepts optional `pageToken` (the existing identifier schema, at most 150 characters). An empty request retains the pinned SDK's original first-call behavior and the response remains an array under `data`, preserving other callers such as chat sharing. Continuation uses the fixed getLatestMomentV2 `sync_token` pattern already present in the SDK's shared-moment reader; this does not expose an arbitrary endpoint or raw HTTP proxy. Only valid array results or the known not-modified response end a continuation; malformed/provider failure envelopes become a safe error rather than a false empty feed. All 53 allowlisted operations and session/rate/redaction checks remain.
+
+Latest feed pages append distinct moment IDs instead of replacing previous cards. Empty or nonadvancing/repeated pages stop the load-more control; a failed page leaves existing content and its cursor available for a manual retry. Page reads are locked while pending, and revision guards discard stale results. History pagination remains page-based with its current user filter and cursor invalidation.
+
+Feed author UIDs are resolved against real friend/self profiles only when an unresolved displayed author needs them. Profile data lives only in the session-owned component; cancelled/unmounted/account-replaced loads cannot enter the next account. Inline named authors are preserved. Unknown authors use an honest unavailable label, not a raw UID or guessed current user. The existing verified-history rule still gates comments/deletion; name hydration does not grant ownership. Existing cards, reactions, media, dates, view dialogs and consumer-only presentation remain.
+
+<!-- docs-check: getLatest continuation and feed author resolution are documented without changing the legacy array response. -->
+
 ### Free experience refresh · 2026-11-16
 
 The operator confirmed successful publishing in the official mobile app. This supersedes treating the earlier gateway observation as a continuing global outage; authenticated web interoperability remains unverified. Read [product research](docs/locket-features.md) for primary sources and the feature-by-feature boundary.

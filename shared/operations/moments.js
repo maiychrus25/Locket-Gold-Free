@@ -121,7 +121,7 @@ export const momentOperations = [
       object: true,
     },
   ),
-  op("moments", "getLatest", "Bảng tin bạn bè"),
+  op("moments", "getLatest", "Bảng tin bạn bè", [id("pageToken", "Trang tiếp theo", false)]),
   op("moments", "getSharedMomentsByUsername", "Khoảnh khắc theo username", [
     id("username", "Username"),
     number("limit", "Số kết quả", 1, 100, 20),
