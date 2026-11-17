@@ -7,7 +7,7 @@ Status: Development; live web Locket interoperability unverified
 
 ## Reels friend feed · 2026-11-17
 
-Status: Development and built-artifact checks passed; production update pending; live account history remains unverified.
+Status: Deployed at https://reelsup.store; development, artifact and public browser checks passed; live account history remains unverified.
 
 <!-- docs-check: Reels uses explicit shared-history continuation; legacy getLatest remains compatible. -->
 

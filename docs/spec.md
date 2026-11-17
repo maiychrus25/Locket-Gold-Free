@@ -4,7 +4,7 @@ Status: Implemented and verified in local development; live Locket interoperabil
 
 ## Reels friend feed · 2026-11-17
 
-Status: Verified in development and immutable Linux artifact; production deployment pending
+Status: Deployed and browser-verified at https://reelsup.store; actual account history remains unverified
 
 Browse shared moments vertically, one per panel, with real author names, touch/keyboard/previous-next navigation and active-video playback. Load older moments from the authenticated shared history using explicit continuation rather than assuming a canonical ID is a history cursor. Keep grid/list choices, existing comments/reactions/viewers, personal history filters and ownership restrictions, and all other account features. Preserve content on failure, show latest-only fallback explicitly, never guess authors and never render technical responses. Plan: [reels-feed.md](plans/reels-feed.md).
 

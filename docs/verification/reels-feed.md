@@ -1,6 +1,6 @@
 # Reels friend feed verification
 
-Status: Development and built-artifact checks passed; not yet deployed
+Status: Deployed and browser-verified at https://reelsup.store; live account history remains unverified
 
 Baseline: 19711ed. Scope and rollback: [plan](../plans/reels-feed.md). The operator still could not reach older moments after the preceding release; its fixture-only canonical-ID continuation was insufficient evidence of live history access.
 
@@ -28,9 +28,19 @@ Image tag: `lock-gold-free:20261117-reels30d73b92d0e9`. OCI index: `sha256:30d73
 
 The Linux build runs all 50 native tests before pruning. The pruned nonroot/read-only runtime passes ESM/CommonJS sharp 0.35.5 conversion, rejected-avatar handling and real ffmpeg-worker checks with networking disabled. Trivy 0.76.2, downloaded from its official release and verified against the published SHA256, reports zero HIGH/CRITICAL findings on this exact image. Production npm audit reports zero findings. No application dependency was added.
 
-The related local prebuilt service was refreshed on loopback port 4317 after artifact checks, avoiding a new-frontend/old-backend mismatch. Its health check returned 200; existing local in-memory sessions were invalidated. The production service still uses the prior release until the scoped deployment below.
+The related local prebuilt service was refreshed on loopback port 4317 after artifact checks, avoiding a new-frontend/old-backend mismatch. Its health check returned 200; existing local in-memory sessions were invalidated. At that checkpoint production still used the prior release; the scoped deployment below records its replacement.
 
 Rollback target: `/opt/lock-gold-free/releases/20261117-feeda3a6911164cb`, image configuration `sha256:8110ac1d8eb92481361f4cfe317869850dab15fd5a9883d1060a1fe295bfaa9a`. Deploy only a verified saved image and existing Compose configuration; do not copy application source or build on the VPS. Verify health plus the hashes of all five nginx configurations and IDs of the seven unrelated containers before promoting release pointers. Replacing the Locket container invalidates its in-memory login sessions.
+
+## Scoped deployment
+
+Source commit: `78b423713d19097197b47a0f96472f1733598280`, published to GitHub main. Release: `/opt/lock-gold-free/releases/20261117-reels30d73b92d0e9`. Transfer bundle SHA256: `ae8954cac977ab62c105c63963ee8d1c9c09952ba231b88af129dfd1e4b9daac`.
+
+The saved image and existing Compose configuration were transferred, hashed and loaded without copying application source, installing packages or building on the VPS. An exclusive deployment lock, exact preflight snapshots and image-configuration verification preceded replacement of the Locket container alone. Health returned 200, restart count stayed zero, runtime user remained node and the root filesystem remained read-only. All five nginx hashes and all seven unrelated container IDs matched the preflight snapshot. Current/previous pointers were promoted only after checks; the prior image/configuration is retained. Only this release's transfer archives were removed; free disk remained approximately 2.72 GiB. No proxy, certificate, WAF or unrelated service changes were made.
+
+Public browser checks: eight Reels scenarios × four desktop/mobile light/dark projects = 32 passed (51.0s), using controlled account/API/media responses and normal TLS validation. A separate unauthenticated Chrome check confirmed `/` and `/api/health` both return 200, the root loads the exact `/assets/index-CFtmcwUd.js` bundle, no third-party script is injected, no-transform remains present and CSP retains script-src self. A Python urllib probe received a Cloudflare 403; the normal browser checks succeeded, so no security configuration was weakened to accommodate that probe. Public fixture checks do not establish live authenticated provider history access.
+
+The local Postman stand-in recorded 3,314 request events during development verification. Final results supersede exploratory failing runs; the final frozen suite, artifact checks and public checks all completed with zero failures. Source and release metadata remain linked in the production release directory. Users need to sign in again after the in-memory session replacement.
 
 ## Limits
 

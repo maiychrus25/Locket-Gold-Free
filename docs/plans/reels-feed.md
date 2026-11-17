@@ -1,6 +1,6 @@
 # Reels friend feed
 
-Status: Verified in development and immutable Linux artifact; production deployment pending
+Status: Deployed and browser-verified at https://reelsup.store; actual account history remains unverified
 
 Baseline: 19711ed; branch fix/reels-feed. Goal: load older shared moments and let the operator browse them vertically, one moment per panel, with clear authors and existing interactions.
 
@@ -13,6 +13,6 @@ The prior repair inferred pagination from canonical_uid and only tested invented
 - [x] Reproduce missing Reels navigation with a failing browser check; inspect the SDK read/parse boundary and add a failing transport check for confirmed data loss.
 - [x] Implement the shared-history continuation with the smallest compatible adapter, strict cursor validation and explicit upstream errors; implement native swipe/snap, keyboard/buttons, video lifecycle and retained grid/list/actions.
 - [x] Run make test, make build, make lint and docs-check; run two browser rounds across desktop/mobile and light/dark, including 320px/short viewport, failure/retry, stale sessions, history, media, friends/chat/profile, caption presets and drafts. Review the actual diff independently.
-- [ ] Build and scan the immutable Linux image, verify the built UI, preserve the previous release, publish source and deploy only the authorized Locket service. Verify public health/UI and unchanged unrelated services; record live-account limitations.
+- [x] Build and scan the immutable Linux image, verify the built UI, preserve the previous release, publish source and deploy only the authorized Locket service. Verify public health/UI and unchanged unrelated services; record live-account limitations.
 
 Risks: wrong author/receiver, discarded or repeated pages, stale account responses, video playing offscreen, narrow-screen overflow and unrelated VPS disruption. Roll back by restoring the prior immutable image/configuration; no user-data deletion or production source editing.
