@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — grid friends feed
+
+- Replace friends' Reels presentation with the existing responsive grid at the operator's request; remove the unused viewer, styles and navigation state.
+- Keep shared-history loading, manual load-more, author names, interactions and history grid/list choices. Videos retain native controls with explicit playback; no dependency or backend contract changes.
+
 ## 2026-11-17 — Reels friend feed
 
 - Browse friends' moments vertically with native snapping, touch/keyboard navigation, previous/next controls and active-video playback.

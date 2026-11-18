@@ -2,11 +2,21 @@
 
 Status: Implemented and verified in local development; live Locket interoperability unverified
 
+## Grid friends feed · 2026-11-18
+
+Status: Verified in development and immutable Linux artifact; production update pending
+
+The operator requests only a grid for friends' moments. Reuse the existing responsive cards; remove Reels selection, swipe navigation and autoplay. Keep explicit load-more continuation, author names, comments, reactions, views, fallback/retry behavior and all account features. Personal history retains its grid/list choices. No backend or dependency changes. Verify all previous account flows plus desktop/mobile light/dark twice before publishing the immutable artifact.
+
 ## Reels friend feed · 2026-11-17
 
-Status: Deployed and browser-verified at https://reelsup.store; actual account history remains unverified
+Status: Reels presentation superseded by the operator-requested grid revision on 2026-11-18; shared-history implementation retained
 
 Browse shared moments vertically, one per panel, with real author names, touch/keyboard/previous-next navigation and active-video playback. Load older moments from the authenticated shared history using explicit continuation rather than assuming a canonical ID is a history cursor. Keep grid/list choices, existing comments/reactions/viewers, personal history filters and ownership restrictions, and all other account features. Preserve content on failure, show latest-only fallback explicitly, never guess authors and never render technical responses. Plan: [reels-feed.md](plans/reels-feed.md).
+
+### Ghi chú sau phát hành
+
+The operator subsequently requested grid-only browsing. The grid revision deliberately replaces Reels navigation and automatic playback; the verified shared-history retrieval and all account interactions remain in use. The historical Reels specification is retained above.
 
 ## Friend feed repair · 2026-11-17
 

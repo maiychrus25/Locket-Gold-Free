@@ -45,3 +45,17 @@ The local Postman stand-in recorded 3,314 request events during development veri
 ## Limits
 
 No real Locket credentials, cookies or server token memory were accessed. Browser checks use controlled account/media responses, including against the compiled artifact. Actual availability/count of an account's older shared moments, official native-app sound behavior and physical phones remain unverified. The upstream can restrict or omit history; the website does not invent posts or promise a paid entitlement.
+
+## Grid revision
+
+Date: 2026-11-18. Status: Development and immutable-artifact verification passed; production update pending.
+
+The operator requested friends in the grid only. Reuse the existing two-column desktop and one-column phone cards, remove the unused Reels component/styles/switch/state and restore explicit native video playback. Shared-history retrieval, load-more/dedupe/retry/fallback, real authors and all reactions/comments/viewers remain unchanged. Personal history retains its grid/list controls and filters. No backend, API, session, dependency or production-configuration changes are part of this revision.
+
+The new grid-only check first failed against the Reels implementation, then passed after the scoped change. Eight existing friend-feed scenarios now exercise the requested presentation while preserving cursor and duplicate-only continuation, exact comment receivers/fromMemory, explicit native video controls with refresh, latest-only fallback, shorter refreshed lists, names, failed-page retries and stale profile responses. A test selector was narrowed to the photo's accessible name after an SVG-icon ambiguity; no product failure or check was hidden.
+
+Verification: make build finished with Build succeeded; full native tests passed 50/50 twice and a final 50/50 run; make lint returned zero warnings; docs-check reports 53 operations/version 0.1.0 clean. The complete 51-scenario browser suite ran four desktop/mobile light/dark projects twice: 408 passed (5.1m), zero failures. The actual compiled Linux image through a local TLS proxy passed all eight friend-feed cases in four projects twice: 64 passed (36.3s). Additional rendered screenshots at 1440, 390 and 320px were inspected, including light and dark phones; no horizontal page overflow was observed. Independent review of the actual diff found no blocking issue.
+
+Image: lock-gold-free:20261118-grid40fa75dff91a. OCI index: sha256:40fa75dff91a3be3a56ddbd35706ff34103b049b3bf3e6f3ae28e581d2dad6c6. Saved image configuration ID: sha256:8f572769b53235e594bb463f3d26dfaa26dd3893ac3799a854cee4b4f861ce83. All 50 native tests passed during its Linux build. The pruned nonroot/read-only runtime passed sharp ESM/CommonJS, avatar-error and ffmpeg-worker checks without networking. Trivy 0.76.2 reported zero HIGH/CRITICAL findings on this exact image; the lockfile and application dependencies are unchanged.
+
+Rollback target for this revision: /opt/lock-gold-free/releases/20261117-reels30d73b92d0e9, configuration ID sha256:362db136115a4832d7f5ba361eb1d2a36baa99a8d85388f06bdf538a557a8521. A fresh snapshot records five nginx hashes and seven unrelated container IDs before the scoped artifact deployment. Public checks and publication metadata follow after deployment. Existing live-account and physical-device limits above still apply; this UI revision does not claim new provider interoperability.

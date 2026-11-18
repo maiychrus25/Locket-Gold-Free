@@ -5,9 +5,17 @@ Status: Development; live web Locket interoperability unverified
 
 <!-- docs-check: API coverage is verified against shared/operations.js -->
 
+## Grid friends feed · 2026-11-18
+
+Status: Development and immutable-artifact checks passed; production update pending; live account history remains unverified.
+
+<!-- docs-check: Friends use the existing grid; shared-history pagination and API contracts remain unchanged. -->
+
+At the operator's request, the friends feed now has only the existing responsive grid: two desktop columns and one phone column below 600px. Remove the Reels component, its styles, layout switch and viewer-only state. Retain the same shared-history reads, actual author mapping, explicit cursor, duplicate handling, latest-only fallback, load-more retry and account boundaries. A visible load-more button appends posts. Photos retain square card styling; videos use native controls and explicit playback rather than automatic looping/muting. Personal history keeps its separate grid/list choices, filters and ownership restrictions. No API, session, security, dependency or media-upload behavior changes.
+
 ## Reels friend feed · 2026-11-17
 
-Status: Deployed at https://reelsup.store; development, artifact and public browser checks passed; live account history remains unverified.
+Status: Deployed at https://reelsup.store; Reels presentation superseded by the grid revision above; shared-history implementation retained. Live account history remains unverified.
 
 <!-- docs-check: Reels uses explicit shared-history continuation; legacy getLatest remains compatible. -->
 

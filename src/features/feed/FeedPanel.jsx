@@ -8,7 +8,6 @@ import { Feedback } from "../../components/Feedback.jsx";
 import { momentDate, localDate, momentAuthor, feedPage } from "../../lib/memories.js";
 import { ViewsDialog } from "./ViewsDialog.jsx";
 import { FriendSelect, friendName } from "./FriendSelect.jsx";
-import { ReelsFeed } from "./ReelsFeed.jsx";
 
 export function FeedPanel({ tab, confirmAction, userUid }) {
   const state = useOperation();
@@ -17,7 +16,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [comment, setComment] = useState({});
   const [cursor, setCursor] = useState("");
   const [filter, setFilter] = useState("");
-  const [layout, setLayout] = useState(tab === "history" ? "grid" : "reels");
+  const [layout, setLayout] = useState("grid");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
   const [reactions, setReactions] = useState({});
@@ -27,7 +26,6 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [loadingPage, setLoadingPage] = useState(true);
   const [fromHistory, setFromHistory] = useState(false);
   const [historyUnavailable, setHistoryUnavailable] = useState(false);
-  const [viewerRevision, setViewerRevision] = useState(0);
   const pageBusy = useRef(true);
   const filterRevision = useRef(0);
   async function load(next = false) {
@@ -59,7 +57,6 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
       const page = tab === "history" ? null : feedPage(next ? records(payload) : [], records(result.value), next ? cursor : "", Array.isArray(result.value) ? undefined : result.value?.nextPageToken || null);
       setFromHistory(tab === "history" || (!Array.isArray(result.value) && !result.value?.historyUnavailable));
       setHistoryUnavailable(Boolean(result.value?.historyUnavailable));
-      if (!next) setViewerRevision(previous => previous + 1);
       setPayload(page ? page.moments : result.value);
       setLoaded(true);
       setCursor(
@@ -191,11 +188,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           </button>
         </form>
       )}
-      <div className="memory-controls" aria-label="Cách hiển thị">
-        {tab !== "history" && <button className="button secondary" aria-pressed={layout === "reels"} onClick={() => setLayout("reels")}>Lướt từng tin</button>}
+      {tab === "history" && <div className="memory-controls" aria-label="Cách hiển thị">
         <button className="button secondary" aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>Dạng lưới</button>
         <button className="button secondary" aria-pressed={layout === "list"} onClick={() => setLayout("list")}>Dạng danh sách</button>
-      </div>
+      </div>}
       {tab === "history" && <div className="memory-filters">
         <label>Tháng kỷ niệm<input type="month" value={month} onChange={event => { setMonth(event.target.value); setDay(""); }} /></label>
         <label>Ngày kỷ niệm<input type="date" value={day} onChange={event => { setDay(event.target.value); setMonth(""); }} /></label>
@@ -216,12 +212,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           <p>Khoảnh khắc được chia sẻ sẽ xuất hiện tại đây.</p>
         </div>
       )}
-      <div className={`memory-layout memory-${layout} ${layout === "reels" ? "" : "daily-grid"}`}>
-        {layout === "reels" && items.length ? <ReelsFeed key={viewerRevision} pageToken={cursor} busy={state.pending || loadingPage} loadMore={() => load(true)}>
-          {renderCards()}
-        </ReelsFeed> : renderCards()}
+      <div className={`daily-grid memory-layout memory-${layout}`}>
+        {renderCards()}
       </div>
-      {cursor && layout !== "reels" && (
+      {cursor && (
         <button className="button secondary" disabled={state.pending || loadingPage} onClick={() => load(true)}>
           {tab === "history" ? "Trang tiếp theo" : "Tải thêm khoảnh khắc"}
         </button>
@@ -244,7 +238,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           return (
             <article className="moment-card" key={id || index}>
               {video ? (
-                <video controls playsInline loop={layout === "reels"} muted={layout === "reels"} preload="metadata" src={video} poster={image} />
+                <video controls playsInline preload="metadata" src={video} poster={image} />
               ) : image ? (
                 <img
                   src={image}
