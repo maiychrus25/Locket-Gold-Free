@@ -7,7 +7,7 @@ Status: Development; live web Locket interoperability unverified
 
 ## Compact moment actions · 2026-11-18
 
-Status: Development and immutable-artifact checks passed; production update pending; live account history remains unverified.
+Status: Deployed at https://reelsup.store; development, artifact and public action checks passed; live account history remains unverified.
 
 <!-- docs-check: Compact controls preserve the existing moment actions and permissions. -->
 

@@ -32,4 +32,4 @@ Objective: reduce visual clutter around each grid moment while retaining every a
 - [x] Write failing compact-action/picker/retry/ownership browser checks and adapt existing callers to the requested UI.
 - [x] Implement the smallest card/dialog/style changes, verify old requests/receivers/fromMemory and independent diff review.
 - [x] Run build/native/lint/docs plus two full desktop/mobile light/dark browser rounds; inspect rendered screenshots.
-- [ ] Build/scan/verify the immutable Linux artifact, publish and deploy only the authorized Locket service; verify domain and unchanged unrelated services with rollback retained.
+- [x] Build/scan/verify the immutable Linux artifact, publish and deploy only the authorized Locket service; verify domain and unchanged unrelated services with rollback retained.

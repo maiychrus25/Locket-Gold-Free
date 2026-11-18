@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased — compact moment actions
+## 2026-11-18 — compact moment actions
 
 - Make grid cards more compact with an author header, one primary action row and a message field beside its send button.
 - Replace the emoji select-and-send pair with six direct choices in the existing dialog; place mark-as-viewed and verified-own-history deletion in a secondary dialog.
 - Preserve exact action payloads, failure retry/pending feedback, delete confirmation and account boundaries; reuse existing components and theme tokens without dependencies.
+- Deployed the verified immutable image to reelsup.store, retained the prior grid release and confirmed unrelated services/configuration unchanged.
 
 ## 2026-11-18 — grid friends feed
 
