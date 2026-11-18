@@ -395,7 +395,7 @@ test("SDK feed shapes render media, reactions and usable history pagination", as
   await expect(page.locator(".moment-card")).toContainText(
     "Khoảnh khắc đầu tiên",
   );
-  await expect(page.locator(".moment-card img")).toBeVisible();
+  await expect(page.locator(".moment-card > img")).toBeVisible();
   const reacting = page.waitForRequest((request) =>
     request.url().endsWith("/api/operations/moments/react"),
   );
@@ -414,7 +414,8 @@ test("SDK feed shapes render media, reactions and usable history pagination", as
   await expect(
     page.getByRole("button", { name: "Trang tiếp theo", exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "Xoá", exact: true }).click();
+  await page.getByRole("button", { name: "Thêm thao tác", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Xoá", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);

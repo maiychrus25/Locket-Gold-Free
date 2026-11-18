@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — compact moment actions
+
+- Make grid cards more compact with an author header, one primary action row and a message field beside its send button.
+- Replace the emoji select-and-send pair with six direct choices in the existing dialog; place mark-as-viewed and verified-own-history deletion in a secondary dialog.
+- Preserve exact action payloads, failure retry/pending feedback, delete confirmation and account boundaries; reuse existing components and theme tokens without dependencies.
+
 ## 2026-11-18 — grid friends feed
 
 - Replace friends' Reels presentation with the existing responsive grid at the operator's request; remove the unused viewer, styles and navigation state.

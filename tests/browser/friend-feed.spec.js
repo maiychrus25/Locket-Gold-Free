@@ -12,6 +12,99 @@ async function fixture(page) {
   ] } }));
 }
 
+test("compact moment actions keep the author above media and message controls on one row", async ({ page }) => {
+  await fixture(page);
+  await page.route("**/compact-photo.svg", route => route.fulfill({ contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#c6b8e4"/></svg>' }));
+  await page.route("**/api/operations/moments/getLatest", route => route.fulfill({ json: { data: [{ ...moment("compact"), thumbnail_url: new URL("/compact-photo.svg", route.request().url()).href }] } }));
+  await page.goto("/");
+  const card = page.locator(".moment-card");
+  await expect(card.getByRole("button", { name: "Chọn cảm xúc", exact: true })).toBeVisible();
+  await expect(card.locator("select")).toHaveCount(0);
+  await expect(card.getByRole("button", { name: "Đánh dấu đã xem", exact: true })).toHaveCount(0);
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const input = await card.getByLabel("Bình luận khoảnh khắc").boundingBox();
+    const send = await card.getByRole("button", { name: "Gửi bình luận", exact: true }).boundingBox();
+    const header = await card.locator(".moment-header").boundingBox();
+    const photo = await card.locator(":scope > img").boundingBox();
+    expect(Math.abs(input.y + input.height / 2 - send.y - send.height / 2)).toBeLessThanOrEqual(2);
+    expect(send.height).toBeGreaterThanOrEqual(44);
+    expect(header.y + header.height).toBeLessThanOrEqual(photo.y + 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  const more = card.getByRole("button", { name: "Thêm thao tác", exact: true });
+  await more.click();
+  await expect(page.getByRole("dialog")).toHaveAccessibleName("Thao tác khoảnh khắc");
+  await expect(page.getByRole("dialog").getByRole("button", { name: "Xoá", exact: true })).toHaveCount(0);
+  const viewed = page.waitForRequest(req => req.url().endsWith("/moments/markAsViewed"));
+  await page.getByRole("dialog").getByRole("button", { name: "Đánh dấu đã xem", exact: true }).click();
+  expect((await viewed).postDataJSON()).toEqual({ momentUid: "compact" });
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(more).toBeFocused();
+});
+
+test("direct emoji choices preserve errors, lock pending writes and close only after success", async ({ page }) => {
+  await fixture(page);
+  await page.route("**/api/operations/moments/getLatest", route => route.fulfill({ json: { data: [moment("emoji")] } }));
+  const calls = []; let fail = true, release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route("**/api/operations/moments/react", async route => {
+    calls.push(route.request().postDataJSON());
+    if (fail) { fail = false; return route.fulfill({ status: 502, json: { error: "fixture unavailable" } }); }
+    await held; return route.fulfill({ json: { data: { success: true } } });
+  });
+  try {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Chọn cảm xúc", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("button", { name: /^Gửi cảm xúc / })).toHaveCount(6);
+    const emoji = dialog.getByRole("button", { name: "Gửi cảm xúc 😂", exact: true });
+    await emoji.click(); await expect(dialog.getByRole("alert")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(1);
+    await emoji.click(); await expect(emoji).toBeDisabled();
+    release(); await expect(dialog).toHaveCount(0);
+    expect(calls).toEqual([{ momentUid: "emoji", reaction: "😂", fromMemory: false }, { momentUid: "emoji", reaction: "😂", fromMemory: false }]);
+    await expect(page.getByRole("button", { name: "Chọn cảm xúc", exact: true })).toBeFocused();
+  } finally { release(); }
+});
+
+test("an account expiry closes a pending emoji dialog without restoring old content", async ({ page }) => {
+  await fixture(page); let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route("**/api/operations/moments/getLatest", route => route.fulfill({ json: { data: [moment("private-old")] } }));
+  await page.route("**/api/operations/moments/react", async route => { await held; return route.fulfill({ json: { data: { success: true } } }); });
+  try {
+    await page.goto("/"); await page.getByRole("button", { name: "Chọn cảm xúc", exact: true }).click();
+    await page.getByRole("button", { name: "Gửi cảm xúc 🔥", exact: true }).click();
+    await page.evaluate(() => window.dispatchEvent(new Event("lock-session-expired")));
+    release(); await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.locator("main")).not.toContainText("private-old");
+  } finally { release(); }
+});
+
+test("dismissing pending action dialogs returns focus and blocks duplicate requests", async ({ page }) => {
+  await fixture(page);
+  await page.route("**/api/operations/moments/getLatest", route => route.fulfill({ json: { data: [moment("focus")] } }));
+  await page.goto("/");
+  for (const [triggerName, choiceName, method] of [["Chọn cảm xúc", "Gửi cảm xúc 😂", "react"], ["Thêm thao tác", "Đánh dấu đã xem", "markAsViewed"]]) {
+    let release, calls = 0;
+    const held = new Promise(resolve => { release = resolve; });
+    await page.route(`**/api/operations/moments/${method}`, async route => { calls++; await held; return route.fulfill({ json: { data: { success: true } } }); });
+    try {
+      const trigger = page.getByRole("button", { name: triggerName, exact: true });
+      await trigger.click();
+      const choice = page.getByRole("dialog").getByRole("button", { name: choiceName, exact: true });
+      await choice.click(); await expect(choice).toBeDisabled();
+      await page.keyboard.press("Escape");
+      await expect(trigger).toBeFocused();
+      await trigger.press("Enter");
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      expect(calls).toBe(1);
+      release(); await expect(trigger).toBeEnabled();
+    } finally { release(); }
+  }
+});
+
 test("friends feed opens only as a responsive grid without Reels controls", async ({ page }) => {
   await fixture(page);
   await page.route("**/api/operations/moments/getLatest", route => route.fulfill({ json: { data: [moment("first"), moment("second", "other-secret"), moment("third")] } }));

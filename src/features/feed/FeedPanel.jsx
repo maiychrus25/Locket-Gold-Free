@@ -3,8 +3,9 @@ import { useOperation } from "../../lib/useOperation.js";
 import { useState, useRef, useEffect } from "react";
 import { request, records, safeUrl } from "../../lib/api.js";
 import { unwrap, postId, imageUrl, identity } from "../../lib/data.js";
-import { RefreshCw, Search, Heart, Eye, Trash2, Send } from "lucide-react";
+import { RefreshCw, Search, Heart, Eye, Trash2, Send, Smile, MoreHorizontal, Check } from "lucide-react";
 import { Feedback } from "../../components/Feedback.jsx";
+import { Modal } from "../../components/Modal.jsx";
 import { momentDate, localDate, momentAuthor, feedPage } from "../../lib/memories.js";
 import { ViewsDialog } from "./ViewsDialog.jsx";
 import { FriendSelect, friendName } from "./FriendSelect.jsx";
@@ -19,7 +20,8 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
   const [layout, setLayout] = useState("grid");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
-  const [reactions, setReactions] = useState({});
+  const [reacting, setReacting] = useState(null);
+  const [options, setOptions] = useState(null);
   const [viewing, setViewing] = useState(null);
   const [profiles, setProfiles] = useState(() => new Map());
   const [profilesLoaded, setProfilesLoaded] = useState(false);
@@ -145,6 +147,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
       state.setNotice("Đã cập nhật khoảnh khắc.");
       if (method === "delete") await load();
     }
+    return result;
   }
   const items = records(payload).filter(item => {
     if (tab !== "history" || (!month && !day)) return true;
@@ -153,6 +156,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
     const key = localDate(date);
     return (!month || key.startsWith(month)) && (!day || key === day);
   });
+  const feedback = { ...state, error: state.error ? "Chưa hoàn tất yêu cầu. Hãy kiểm tra lại trước khi thử lại." : "" };
   return (
     <div>
       <div className="daily-toolbar">
@@ -198,7 +202,7 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         <button className="button secondary" onClick={() => { setDay(""); setMonth(""); }}>Xoá bộ lọc ngày</button>
         <p className="muted">Chỉ lọc các khoảnh khắc trên trang đã tải, không phải toàn bộ lịch sử. Ngày hiển thị theo múi giờ thiết bị.</p>
       </div>}
-      <Feedback state={{ ...state, error: state.error ? "Chưa hoàn tất yêu cầu. Hãy kiểm tra lại trước khi thử lại." : "" }} />
+      {!reacting && !options && <Feedback state={feedback} />}
       {historyUnavailable && <p role="status" className="muted">Hiện chỉ tải được tin mới nhất. Các khoảnh khắc cũ chưa tải được; bạn bấm Tải lại để thử lại nhé.</p>}
       {!loaded && !state.error && (
         <p role="status" className="muted">
@@ -221,6 +225,28 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
         </button>
       )}
       {viewing && <ViewsDialog key={viewing} momentUid={viewing} close={() => setViewing(null)} />}
+      {reacting && <Modal title="Chọn cảm xúc" close={() => setReacting(null)}>
+        <Feedback state={feedback} />
+        <div className="moment-reaction-grid">
+          {["❤️", "😂", "🥰", "🔥", "👏", "😮"].map(emoji => <button key={emoji} className="moment-choice" aria-label={`Gửi cảm xúc ${emoji}`} disabled={state.pending}
+            onClick={async () => {
+              if (await action("react", { momentUid: reacting, reaction: emoji, fromMemory: tab === "history" || fromHistory })) setReacting(null);
+            }}><span aria-hidden="true">{emoji}</span></button>)}
+        </div>
+      </Modal>}
+      {options && <Modal title="Thao tác khoảnh khắc" close={() => setOptions(null)}>
+        <Feedback state={feedback} />
+        <div className="moment-menu-actions">
+          <button className="button secondary" disabled={state.pending} onClick={async () => {
+            if (await action("markAsViewed", { momentUid: options.id })) setOptions(null);
+          }}><Check size={18} aria-hidden="true" />Đánh dấu đã xem</button>
+          {options.canDelete && <button className="button secondary danger-action" disabled={state.pending} onClick={() => {
+            const id = options.id;
+            setOptions(null);
+            confirmAction("Xoá khoảnh khắc này?", () => action("delete", { momentUid: id }));
+          }}><Trash2 size={18} aria-hidden="true" />Xoá</button>}
+        </div>
+      </Modal>}
     </div>
   );
   function renderCards() {
@@ -235,8 +261,22 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
           const authorUid = identity(author);
           const person = friendName(author) !== "Bạn bè" ? author : profiles.get(authorUid);
           const name = friendName(person);
+          const authorName = name !== "Bạn bè" ? name : authorUid && authorUid === userUid ? "Bạn" : "Chưa rõ người đăng";
+          const avatar = imageUrl(person);
           return (
             <article className="moment-card" key={id || index}>
+              <header className="moment-header">
+                <span className="moment-avatar" aria-hidden="true">{avatar ? <img src={avatar} alt="" loading="lazy" /> : authorName === "Chưa rõ người đăng" ? "?" : Array.from(authorName)[0]}</span>
+                <div className="moment-identity">
+                  <h3>{authorName}</h3>
+                  {date ? <time className="muted" dateTime={date.toISOString()}>{date.toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</time> : <small className="muted">Chưa rõ thời gian</small>}
+                </div>
+                <button className="icon-button moment-more" aria-label="Thêm thao tác" title="Thêm thao tác" disabled={!id} aria-disabled={state.pending} onClick={() => {
+                  if (state.pending) return;
+                  state.setError(""); state.setNotice("");
+                  setOptions({ id, canDelete: tab === "history" && Boolean(authorUid) && authorUid === userUid });
+                }}><MoreHorizontal size={20} aria-hidden="true" /></button>
+              </header>
               {video ? (
                 <video controls playsInline preload="metadata" src={video} poster={image} />
               ) : image ? (
@@ -251,12 +291,10 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                 />
               ) : null}
               <div className="moment-body">
-                <h3>{name !== "Bạn bè" ? name : authorUid && authorUid === userUid ? "Bạn" : "Chưa rõ người đăng"}</h3>
-                {date ? <time className="muted" dateTime={date.toISOString()}>{date.toLocaleString("vi-VN")}</time> : <small className="muted">Chưa rõ thời gian</small>}
                 {typeof item.caption === "string" && <p>{item.caption}</p>}
-                <div className="action-row">
+                <div className="moment-actions-row">
                   <button
-                    className="button secondary"
+                    className="moment-action moment-like"
                     disabled={state.pending || !id}
                     onClick={() =>
                       action("react", {
@@ -266,46 +304,18 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                       })
                     }
                   >
-                    <Heart size={14} />
+                    <Heart size={18} aria-hidden="true" />
                     Thả tim
                   </button>
-                  <button
-                    className="button secondary"
-                    disabled={state.pending || !id}
-                    onClick={() =>
-                      action("markAsViewed", {
-                        momentUid: id,
-                      })
-                    }
-                  >
-                    <Eye size={14} />
-                    Đã xem
-                  </button>
-                  <select aria-label="Chọn cảm xúc" value={reactions[id] || "❤️"} onChange={event => setReactions(previous => ({ ...previous, [id]: event.target.value }))}>
-                    {["❤️", "😂", "🥰", "🔥", "👏", "😮"].map(emoji => <option key={emoji} value={emoji}>{emoji}</option>)}
-                  </select>
-                  <button className="button secondary" disabled={state.pending || !id} onClick={() => action("react", { momentUid: id, reaction: reactions[id] || "❤️", fromMemory: tab === "history" || fromHistory })}>Gửi cảm xúc</button>
-                  <button className="button secondary" disabled={!id} onClick={() => setViewing(id)}>Xem lượt xem</button>
-                  {tab === "history" && authorUid && authorUid === userUid && (
-                    <button
-                      className="button secondary"
-                      disabled={state.pending || !id}
-                      onClick={() =>
-                        confirmAction("Xoá khoảnh khắc này?", () =>
-                          action("delete", {
-                            momentUid: id,
-                          }),
-                        )
-                      }
-                    >
-                      <Trash2 size={14} />
-                      Xoá
-                    </button>
-                  )}
+                  <button className="icon-button" aria-label="Chọn cảm xúc" title="Chọn cảm xúc" disabled={!id} aria-disabled={state.pending} onClick={() => {
+                    if (state.pending) return;
+                    state.setError(""); state.setNotice(""); setReacting(id);
+                  }}><Smile size={20} aria-hidden="true" /></button>
+                  <button className="icon-button" aria-label="Xem lượt xem" title="Xem lượt xem" disabled={!id} onClick={() => setViewing(id)}><Eye size={20} aria-hidden="true" /></button>
                 </div>
                 {authorUid && (
                   <form
-                    className="inline-form"
+                    className="moment-comment"
                     onSubmit={async (event) => {
                       event.preventDefault();
                       const result = await state.run("moments", "comment", {
@@ -336,11 +346,11 @@ export function FeedPanel({ tab, confirmAction, userUid }) {
                       }
                     />
                     <button
-                      className="button secondary"
+                      className="icon-button moment-send"
                       disabled={state.pending || !id}
                       aria-label="Gửi bình luận"
                     >
-                      <Send size={15} />
+                      <Send size={17} aria-hidden="true" />
                     </button>
                   </form>
                 )}

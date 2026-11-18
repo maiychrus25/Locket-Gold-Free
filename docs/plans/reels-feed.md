@@ -24,3 +24,12 @@ Objective: show friends only in the existing responsive grid. Scope: FeedPanel, 
 - [x] Reproduce the missing grid-only behavior with a failing browser check, then remove Reels-specific presentation and adapt checks to the requested grid/media behavior.
 - [x] Run build, full native tests twice, lint, docs-check and two complete desktop/mobile light/dark browser rounds; inspect screenshots and actual diff with an independent reviewer.
 - [x] Build/scan the Linux artifact, verify the compiled grid, publish source and replace only the authorized Locket release. Verify the domain and retain rollback plus unrelated-service snapshots.
+
+## Compact actions revision · 2026-11-18
+
+Objective: reduce visual clutter around each grid moment while retaining every account action. Scope: FeedPanel card presentation and dialogs, feed.css, corresponding browser callers/tests and documentation. Reuse Modal/Feedback, actual author/profile helpers, the existing action handler, grid, native video controls and session lifecycle. No dependency, backend or API change. Main actions are heart, emoji picker and viewers; the secondary dialog contains mark-as-viewed and verified-own-history delete. Keep a single-row message composer, explicit pending/retry feedback, delete confirmation and keyboard/focus access. Risks: hidden or misdirected actions, lost drafts, wrong deletion ownership, modal errors/focus and narrow-screen overflow. Rollback uses release 20261118-grid40fa75dff91a.
+
+- [x] Write failing compact-action/picker/retry/ownership browser checks and adapt existing callers to the requested UI.
+- [x] Implement the smallest card/dialog/style changes, verify old requests/receivers/fromMemory and independent diff review.
+- [x] Run build/native/lint/docs plus two full desktop/mobile light/dark browser rounds; inspect rendered screenshots.
+- [ ] Build/scan/verify the immutable Linux artifact, publish and deploy only the authorized Locket service; verify domain and unchanged unrelated services with rollback retained.

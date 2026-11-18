@@ -29,3 +29,83 @@
 .memory-layout .moment-body p { font-size: 14px; }
 .memory-layout .moment-body h3 { overflow-wrap: anywhere; }
 .memory-layout .action-row button { min-height: 44px; font-size: 14px; }
+
+.moment-card .moment-header {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+}
+.moment-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+  overflow: hidden;
+}
+.moment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.moment-identity { min-width: 0; overflow-wrap: anywhere; }
+.moment-identity h3 { margin: 0; color: var(--ink); font-size: 15px; line-height: 1.4; }
+.moment-identity time, .moment-identity small { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.moment-card .moment-more, .moment-actions-row > .icon-button, .moment-comment .moment-send {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 12px;
+}
+.moment-card button[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+.memory-layout .moment-body { padding: 14px 16px 16px; }
+.memory-layout .moment-body > p { margin: 0 0 12px; line-height: 1.6; }
+.moment-actions-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: 8px;
+}
+.moment-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.moment-like { justify-self: start; color: color-mix(in srgb, var(--error) 70%, var(--muted)); }
+.moment-action:hover:enabled, .moment-choice:hover:enabled { background: var(--soft); }
+.moment-comment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--soft);
+}
+.moment-comment input { min-width: 0; min-height: 44px; height: 44px; padding: 8px 10px; border: 0; border-radius: 12px; background: transparent; font-size: 16px; }
+.moment-comment .moment-send { display: inline-grid; place-items: center; background: var(--accent-soft); color: var(--accent-ink); }
+.moment-comment .moment-send:hover:enabled { background: var(--border); }
+.moment-reaction-grid { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 8px; }
+.moment-choice { display: grid; place-items: center; min-width: 44px; min-height: 56px; padding: 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: var(--ink); }
+.moment-choice span { font-size: 28px; line-height: 1; }
+.moment-menu-actions { display: grid; gap: 8px; min-width: 0; }
+.moment-menu-actions > .button { width: 100%; min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
+.moment-menu-actions > .danger-action { color: var(--error); }

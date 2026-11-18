@@ -1,6 +1,6 @@
 # Verification record
 
-Latest: [grid friends feed](verification/reels-feed.md#grid-revision). Earlier: [Reels friend feed](verification/reels-feed.md), [friend feed repair](verification/friend-feed.md), [hardened server release](verification/server-release.md), [mobile design verification](verification/mobile-design.md), [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
+Latest: [compact moment actions](verification/reels-feed.md#compact-actions-revision). Earlier: [grid friends feed](verification/reels-feed.md#grid-revision), [Reels friend feed](verification/reels-feed.md), [friend feed repair](verification/friend-feed.md), [hardened server release](verification/server-release.md), [mobile design verification](verification/mobile-design.md), [free consumer experience and preset-color verification](verification/free-experience.md), [structure refactor and gateway errors](verification/project-structure.md). The record below describes the initial implementation.
 
 Status: Verified in local development on 2026-11-16. No public deployment.
 

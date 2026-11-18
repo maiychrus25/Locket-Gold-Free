@@ -5,6 +5,16 @@ Status: Development; live web Locket interoperability unverified
 
 <!-- docs-check: API coverage is verified against shared/operations.js -->
 
+## Compact moment actions · 2026-11-18
+
+Status: Development and immutable-artifact checks passed; production update pending; live account history remains unverified.
+
+<!-- docs-check: Compact controls preserve the existing moment actions and permissions. -->
+
+Moment cards keep the responsive grid and place a real author image/initial, wrapping name, local date without seconds and more-action button above the media. Below the caption, the main row offers heart, direct emoji selection and viewers. The message field and send button share one row at 320px. Six emoji choices and secondary actions reuse the existing native Modal/Feedback components; there is no new dependency, endpoint or provider call shape. Mark-as-viewed remains explicit. Delete appears only for verified owned personal-history posts and still requires the existing confirmation.
+
+Dialogs retain pending/disabled states, one visible recovery message, Escape/backdrop dismissal and focus restoration. Failed emoji or mark-as-viewed requests keep the dialog open for retry; success closes it. Session generation changes unmount the card dialogs, and late responses cannot restore old account content. Native video controls, manual playback, paging/deduplication, latest-only fallback and all other account flows remain unchanged. Author initials do not invent a profile identity, and no reaction counts are fabricated.
+
 ## Grid friends feed · 2026-11-18
 
 Status: Deployed at https://reelsup.store; development, artifact and public grid checks passed; live account history remains unverified.

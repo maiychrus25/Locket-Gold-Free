@@ -2,6 +2,12 @@
 
 Status: Implemented and verified in local development; live Locket interoperability unverified
 
+## Compact moment actions · 2026-11-18
+
+Status: Verified in development and immutable Linux artifact; production update pending
+
+The operator requests cleaner, more modern controls. Keep the grid and every existing action while reducing visible clutter: author header above media, one heart/emoji/viewer row, a single-row message composer and the existing accessible dialogs for secondary actions. Select emoji in one action; keep errors/pending feedback, exact moment/receiver/fromMemory values, own-history deletion permission and confirmation, account isolation, keyboard access, light/dark consistency and 44px touch targets at 320px. No backend or dependency changes. Plan: [compact revision](plans/reels-feed.md#compact-actions-revision--2026-11-18).
+
 ## Grid friends feed · 2026-11-18
 
 Status: Deployed and browser-verified at https://reelsup.store; actual account history remains unverified

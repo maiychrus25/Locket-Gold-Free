@@ -221,7 +221,11 @@ test("history hides actions for unknown authors and deletes only the current use
   await expect(
     card("Other author").getByRole("button", { name: "Xoá", exact: true }),
   ).toHaveCount(0);
-  await expect(
-    card("Own author").getByRole("button", { name: "Xoá", exact: true }),
-  ).toBeVisible();
+  for (const caption of ["Unknown author", "Other author", "Own author"]) {
+    await card(caption).getByRole("button", { name: "Thêm thao tác", exact: true }).click();
+    const remove = page.getByRole("dialog").getByRole("button", { name: "Xoá", exact: true });
+    if (caption === "Own author") await expect(remove).toBeVisible();
+    else await expect(remove).toHaveCount(0);
+    await page.keyboard.press("Escape");
+  }
 });

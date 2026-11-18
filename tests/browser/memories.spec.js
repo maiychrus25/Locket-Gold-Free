@@ -45,9 +45,10 @@ test('emoji payload and viewers dialog use returned safe records with loading an
     await route.fulfill({json:{data:{moment_views:[{user:{uid:'viewer-uid',displayName:'Linh',avatar_url:'javascript:alert(1)'}}]}}});
   });
   await login(page);
-  await page.getByLabel('Chọn cảm xúc').selectOption('😂');
+  await page.getByRole('button',{name:'Chọn cảm xúc',exact:true}).click();
   const reaction = page.waitForRequest('**/api/operations/moments/react');
-  await page.getByRole('button',{name:'Gửi cảm xúc',exact:true}).click();
+  await page.getByRole('button',{name:'Gửi cảm xúc 😂',exact:true}).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   expect((await reaction).postDataJSON()).toEqual({momentUid:'moment-one',reaction:'😂',fromMemory:false});
   await page.getByRole('button',{name:'Xem lượt xem',exact:true}).click();
   await expect(page.getByRole('dialog')).toContainText('Đang tải lượt xem');
