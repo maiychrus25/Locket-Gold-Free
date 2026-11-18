@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased — grid friends feed
+## 2026-11-18 — grid friends feed
 
 - Replace friends' Reels presentation with the existing responsive grid at the operator's request; remove the unused viewer, styles and navigation state.
 - Keep shared-history loading, manual load-more, author names, interactions and history grid/list choices. Videos retain native controls with explicit playback; no dependency or backend contract changes.
+- Deployed the verified prebuilt image to reelsup.store, retained the preceding release and confirmed unrelated services/configuration unchanged.
 
 ## 2026-11-17 — Reels friend feed
 

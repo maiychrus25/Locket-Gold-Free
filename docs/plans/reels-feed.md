@@ -1,6 +1,6 @@
 # Reels friend feed
 
-Status: Reels shipped; grid presentation revision verified in development and immutable artifact; production update pending
+Status: Grid presentation revision deployed and browser-verified at https://reelsup.store; actual account history remains unverified
 
 Baseline: 19711ed; branch fix/reels-feed. Goal: load older shared moments and let the operator browse them vertically, one moment per panel, with clear authors and existing interactions.
 
@@ -23,4 +23,4 @@ Objective: show friends only in the existing responsive grid. Scope: FeedPanel, 
 
 - [x] Reproduce the missing grid-only behavior with a failing browser check, then remove Reels-specific presentation and adapt checks to the requested grid/media behavior.
 - [x] Run build, full native tests twice, lint, docs-check and two complete desktop/mobile light/dark browser rounds; inspect screenshots and actual diff with an independent reviewer.
-- [ ] Build/scan the Linux artifact, verify the compiled grid, publish source and replace only the authorized Locket release. Verify the domain and retain rollback plus unrelated-service snapshots.
+- [x] Build/scan the Linux artifact, verify the compiled grid, publish source and replace only the authorized Locket release. Verify the domain and retain rollback plus unrelated-service snapshots.

@@ -48,7 +48,7 @@ No real Locket credentials, cookies or server token memory were accessed. Browse
 
 ## Grid revision
 
-Date: 2026-11-18. Status: Development and immutable-artifact verification passed; production update pending.
+Date: 2026-11-18. Status: Deployed and browser-verified at https://reelsup.store; live account history remains unverified.
 
 The operator requested friends in the grid only. Reuse the existing two-column desktop and one-column phone cards, remove the unused Reels component/styles/switch/state and restore explicit native video playback. Shared-history retrieval, load-more/dedupe/retry/fallback, real authors and all reactions/comments/viewers remain unchanged. Personal history retains its grid/list controls and filters. No backend, API, session, dependency or production-configuration changes are part of this revision.
 
@@ -59,3 +59,7 @@ Verification: make build finished with Build succeeded; full native tests passed
 Image: lock-gold-free:20261118-grid40fa75dff91a. OCI index: sha256:40fa75dff91a3be3a56ddbd35706ff34103b049b3bf3e6f3ae28e581d2dad6c6. Saved image configuration ID: sha256:8f572769b53235e594bb463f3d26dfaa26dd3893ac3799a854cee4b4f861ce83. All 50 native tests passed during its Linux build. The pruned nonroot/read-only runtime passed sharp ESM/CommonJS, avatar-error and ffmpeg-worker checks without networking. Trivy 0.76.2 reported zero HIGH/CRITICAL findings on this exact image; the lockfile and application dependencies are unchanged.
 
 Rollback target for this revision: /opt/lock-gold-free/releases/20261117-reels30d73b92d0e9, configuration ID sha256:362db136115a4832d7f5ba361eb1d2a36baa99a8d85388f06bdf538a557a8521. A fresh snapshot records five nginx hashes and seven unrelated container IDs before the scoped artifact deployment. Public checks and publication metadata follow after deployment. Existing live-account and physical-device limits above still apply; this UI revision does not claim new provider interoperability.
+
+Grid deployment: source commit dedec72892241ff59daf4b6a27427a9be00b143c published to main; release /opt/lock-gold-free/releases/20261118-grid40fa75dff91a. Bundle SHA256 07bb7b255baf3c5291c08237050ee033fd988f677ba0a998c21e8f17aad599b6 was verified before loading the saved image. After an idle SSH connection dropped, the connection was renewed and the complete preflight still matched before any deployment. Only the Locket artifact was replaced; no application source was copied or built on the VPS. Health is healthy, restart count zero, runtime remains nonroot/read-only, all five nginx hashes and seven unrelated container IDs are unchanged, and rollback pointers retain the prior release. Transfer archives were removed; free disk was approximately 2.76 GiB. In-memory login sessions require reconnection after replacement.
+
+Public normal-TLS checks of all eight friend-feed scenarios in four desktop/mobile light/dark projects passed 32/32 (46.6s), using controlled account/API/media data. A separate unauthenticated Chrome probe confirmed root and health HTTP 200, the exact /assets/index-Dk4ZohcD.js bundle, retained no-transform and script-src self, and no injected third-party script. These public checks verify the deployed grid and account-independent UI behavior, not a real account's history or physical-device playback.

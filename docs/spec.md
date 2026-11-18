@@ -4,7 +4,7 @@ Status: Implemented and verified in local development; live Locket interoperabil
 
 ## Grid friends feed · 2026-11-18
 
-Status: Verified in development and immutable Linux artifact; production update pending
+Status: Deployed and browser-verified at https://reelsup.store; actual account history remains unverified
 
 The operator requests only a grid for friends' moments. Reuse the existing responsive cards; remove Reels selection, swipe navigation and autoplay. Keep explicit load-more continuation, author names, comments, reactions, views, fallback/retry behavior and all account features. Personal history retains its grid/list choices. No backend or dependency changes. Verify all previous account flows plus desktop/mobile light/dark twice before publishing the immutable artifact.
 

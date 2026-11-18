@@ -7,7 +7,7 @@ Status: Development; live web Locket interoperability unverified
 
 ## Grid friends feed · 2026-11-18
 
-Status: Development and immutable-artifact checks passed; production update pending; live account history remains unverified.
+Status: Deployed at https://reelsup.store; development, artifact and public grid checks passed; live account history remains unverified.
 
 <!-- docs-check: Friends use the existing grid; shared-history pagination and API contracts remain unchanged. -->
 
